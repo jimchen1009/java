@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package com.ximuyi.akkagame.server.proto;
+
+message ProEmpty{
+}
+
+message ProString{
+    string value = 1;
+}
+
+message ProInteger{
+    int32 value = 1;
+}

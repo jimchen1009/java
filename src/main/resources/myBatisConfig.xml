@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <properties resource="jdbc.properties"/>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="autoMappingBehavior" value="NONE"/>
+    </settings>
+
+    <typeHandlers>
+        <package name="com.ximuyi.demo.mybatis.config.StringTypeHandler"/>
+    </typeHandlers>
+
+    <!-- 配置开发环境，可以配置多个，在具体用时再做切换 -->
+    <environments default="test">
+        <environment id="test">
+            <transactionManager type="JDBC"></transactionManager>    <!-- 事务管理类型：JDBC、MANAGED -->
+            <dataSource type="com.ximuyi.demo.mybatis.db.HikariSourceFactory">
+                <!-- 数据源类型：POOLED、UNPOOLED、JNDI -->
+                <property name="driverClassName" value="${jdbc.driverClassName}" />
+                <property name="jdbcUrl" value="${jdbc.url}" />
+                <property name="username" value="${jdbc.username}" />
+                <property name="password" value="${jdbc.password}" />
+            </dataSource>
+            <!--<dataSource type="POOLED">-->
+                <!--&lt;!&ndash; 数据源类型：POOLED、UNPOOLED、JNDI &ndash;&gt;-->
+                <!--<property name="driver" value="${jdbc.driverClassName}" />-->
+                <!--<property name="url" value="${jdbc.url}" />-->
+                <!--<property name="username" value="${jdbc.username}" />-->
+                <!--<property name="password" value="${jdbc.password}" />-->
+            <!--</dataSource>-->
+        </environment>
+    </environments>
+    <databaseIdProvider type="com.ximuyi.demo.mybatis.config.SourceIdProvider">
+        <property name="MySQL" value="mysql"/>
+    </databaseIdProvider>
+
+    <!-- 加载映射文件 mapper -->
+    <mappers>
+        <!-- 路径用 斜线（/） 分割，而不是用 点(.) -->
+        <!-- 在使用“包名引入映射器”时一定要注意 xxxMapper.java 和 xxxMapper.xml 命名完全相同，且均在所引入包下 -->
+        <package name="com.ximuyi.demo.mybatis.mapper"/>
+
+        <!--<mapper resource="com/ximuyi/demo/mybatis/mapper/BillMapper.xml"></mapper>-->
+        <!--<mapper resource="com/ximuyi/demo/mybatis/mapper/GoodsMapper.xml"></mapper>-->
+        <!--<mapper resource="com/ximuyi/demo/mybatis/mapper/IdgenMapper.xml"></mapper>-->
+        <!--<mapper resource="com/ximuyi/demo/mybatis/mapper/IdgenMapper.xml"></mapper>-->
+        <!--<mapper resource="com/ximuyi/demo/mybatis/mapper/UserMapper.xml"></mapper>-->
+        <!--<mapper resource="com/ximuyi/demo/mybatis/mapper/SupplierMapper.xml"></mapper>-->
+    </mappers>
+
+</configuration>

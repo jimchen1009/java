@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package com.ximuyi.akkagame.server.proto;
+
+message TestRequest{
+}
+
+message TestResponse{
+    int64 currentDateTime = 1;
+}

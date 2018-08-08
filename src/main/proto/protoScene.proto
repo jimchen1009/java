@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package com.ximuyi.akkagame.server.proto;
+
+
+message ProPosXYZ {
+    float x = 1;
+    float y = 2;
+}
+
+message ProJoinScene {
+    int64 uniqueId = 1;    //唯一ID
+    int32 defineId = 2;    //定义ID
+    int32 type = 3;        //对象类型
+    ProPosXYZ pos = 4;      //坐标位置
+    int32 index = 5;        //消息位置
+}
+
+message ProMoveScene {
+    int64 uniqueId = 1;    //唯一ID
+    ProPosXYZ pos = 2;      //坐标位置
+    int32 index = 3;        //消息位置
+}
+
+message ProLeaveScene {
+    int64 uniqueId = 1;    //唯一ID
+    int32 index = 2;        //消息位置
+}
+
+
+message SceneTickResponse {
+    repeated ProJoinScene joinScene = 1;
+    repeated ProMoveScene moveScene = 2;
+    repeated ProLeaveScene leaveScene = 3;
+}
