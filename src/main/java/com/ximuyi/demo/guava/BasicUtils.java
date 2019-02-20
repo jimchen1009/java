@@ -48,10 +48,10 @@ public class BasicUtils {
 //        objects();
 //        comparator();
 //        immutable();
-//        cache();
+        cache();
 //        future();
 //        service();
-        string();
+//        string();
     }
 
     private static void string(){

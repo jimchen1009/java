@@ -105,5 +105,17 @@
     <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.5.1-1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:5.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:5.1" level="project" />
+    <orderEntry type="library" name="Maven: com.ibeetl:beetlsql:2.10.9" level="project" />
+    <orderEntry type="library" name="Maven: com.ibeetl:beetl:2.9.2" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.15.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-example:2.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-core:2.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-integration-beans:2.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-integration-jmx:2.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-integration-ognl:2.0.19" level="project" />
+    <orderEntry type="library" name="Maven: ognl:ognl:3.2.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-statemachine:2.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring:2.5.6.SEC03" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
   </component>
 </module>
