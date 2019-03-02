@@ -26,6 +26,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.RateLimiter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +43,8 @@ import java.util.stream.Collectors;
 
 public class BasicUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(BasicUtils.class);
+
     private static final Random ramdon = new Random();
 
     public static void main(String[] args) throws Exception {
@@ -48,10 +53,19 @@ public class BasicUtils {
 //        objects();
 //        comparator();
 //        immutable();
-        cache();
+//        cache();
 //        future();
 //        service();
 //        string();
+        ratelimite();
+    }
+
+    private static void ratelimite(){
+        final RateLimiter limiter = RateLimiter.create(0.5);
+        for (int i = 0; i < 100; i++) {
+            double acquire = limiter.acquire(1);
+            logger.debug("limiter acquire: {}", acquire);
+        }
     }
 
     private static void string(){

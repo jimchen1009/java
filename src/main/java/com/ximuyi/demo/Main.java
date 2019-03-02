@@ -56,6 +56,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
+       System.out.println( Long.toBinaryString(-1L));
         Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         System.out.println(calendar.getTime());

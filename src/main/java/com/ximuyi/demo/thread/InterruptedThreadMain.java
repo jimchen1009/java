@@ -106,9 +106,9 @@ public class InterruptedThreadMain {
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
-//        testInterrupted();
+        testInterrupted();
 //        testDealthLockThreadInterrupted();
-        testChannelInterrupted();
+//        testChannelInterrupted();
     }
 
     private static void testChannelInterrupted() throws InterruptedException, IOException {
