@@ -56,7 +56,13 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
-       System.out.println( Long.toBinaryString(-1L));
+
+	    for (int i = 0; i < 100; i++) {
+		    String string = "ALTER TABLE `guild_name%d`\n" +
+				    "\tCHANGE COLUMN `Name` `Name` VARCHAR(15) NOT NULL COLLATE 'utf8mb4_bin';";
+		    System.out.println(String.format(string, i));
+	    }
+        System.out.println(System.nanoTime());
         Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         System.out.println(calendar.getTime());

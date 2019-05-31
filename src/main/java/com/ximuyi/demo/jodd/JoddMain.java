@@ -10,9 +10,9 @@ public class JoddMain {
         String clsspath = FreeMarkerMain.class.getResource("/").getPath();
         ClassScanner scanner = new ClassScanner(){
             @Override
-            protected void onEntry(EntryData entryData) {
-                super.onEntry(entryData);
-                System.out.println(ReflectionToStringBuilder.toString(entryData));
+            protected void onEntry(ClassPathEntry classPathEntry) {
+                super.onEntry(classPathEntry);
+                System.out.println(ReflectionToStringBuilder.toString(classPathEntry));
             }
         };
         scanner.includeResources(true);
