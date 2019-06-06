@@ -57,19 +57,6 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
 
-	    for (int i = 0; i < 100; i++) {
-		    String string = "ALTER TABLE `guild_name%d`\n" +
-				    "\tCHANGE COLUMN `Name` `Name` VARCHAR(15) NOT NULL COLLATE 'utf8mb4_bin';";
-		    System.out.println(String.format(string, i));
-	    }
-        System.out.println(System.nanoTime());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        System.out.println(calendar.getTime());
-        for (int i = 1; i <= 7; i++) {
-            calendar.set(Calendar.DAY_OF_WEEK, i);
-            System.out.println(calendar.getTime());
-        }
         BasicThreadFactory factory = new BasicThreadFactory.Builder()
                 .namingPattern("CacheScheduler-%d")
                 .uncaughtExceptionHandler((t, e) -> logger.error("", e))
@@ -78,92 +65,13 @@ public class Main {
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, factory);
         executor.scheduleWithFixedDelay(()-> {
             logger.debug("UnsupportedOperationException");
+            //如果抛出异常，不捕获的话，这个任务就不会再被定时调度了。
+            throw new UnsupportedOperationException();
         }, 2, 1, TimeUnit.MILLISECONDS);
 
         Thread.sleep(TimeUnit.HOURS.toMillis(10));
 
         valueOf("zookeeper://root:000000@10.17.2.68:2181,10.17.2.68:2182,10.17.2.68:2183");
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 100; i++) {
-            builder.append(String.format("TRUNCATE `guild_name%d`;", i)).append("\n");
-        }
-        System.out.println(builder.toString());
-        String[] allWords = new String[]{
-                "game", "magic", "puzzle", "cube", "knife", "pliers", "screwdriver", "wrench", "axe", "saw",
-                "scissors", "chisel", "hammer", "brush", "jersey", "jacket", "skirt", "robe", "tights", "shorts",
-                "pants", "skorts", "dress", "hoodie", "T-shirt", "shirt", "bra", "boots", "flats", "pumps",
-                "sandals", "slippers", "flip", "flops", "boat", "shoe", "heels", "oxfords", "loafer", "watch",
-                "quartz", "mechanical", "digital", "sports", "dual", "display", "cover", "tree", "shoelace", "cutting",
-                "crossbody", "bag", "backpack", "wallet", "travel", "briefcase", "pack", "waist", "shoulder", "clutches",
-                "mat", "letter", "opener", "utility", "glue", "stick", "liquid", "adhesive", "tape", "dispenser",
-                "wristlet", "cosmetic", "staple", "stapler", "glue", "clips", "chair", "computer", "laptop", "conference",
-                "magazine", "rack", "sofa", "reception", "bookend", "card", "file", "tray", "mobile", "phone",
-                "cable", "screen", "protector", "power", "bank", "dust", "plug", "adapter", "case", "coffee",
-                "maker", "blender", "curling", "iron", "humidifier", "hair", "trimmer", "eye", "shadow", "eyebrow",
-                "enhancer", "eyeliner", "eyelash", "lipstick", "bedding", "pillow", "towel", "cushion", "carpet", "rug",
-        };
-
-        Set<Character> allLetters = new HashSet<>();
-        for (String allWord : allWords) {
-            for (int i = 0; i < allWord.length(); i++) {
-                allLetters.add(allWord.charAt(i));
-            }
-        }
-        ArrayList<Character> allCharacters = new ArrayList<>(allLetters);
-        allCharacters.sort(Comparator.comparingInt(c0 -> c0));
-
-        Set<Character> abcdefLetters = new HashSet<>();
-        abcdefLetters.addAll(Arrays.asList('a', 'b', 'c', 'e', 'e', 'f'));
-        Map<Integer, Set<Character>> groupLetter = new HashMap<>();
-        for (int i = 0; i < allCharacters.size(); i++) {
-            char ch = allCharacters.get(i);
-            if (ch == 'T'){
-                ch = 't';
-            }
-            if (abcdefLetters.contains(ch)){
-                continue;
-            }
-            int key = i % 5;
-            Set<Character> letters = groupLetter.computeIfAbsent(key, (k) -> new HashSet<>());
-            letters.add(ch);
-        }
-        Map<Integer, Set<String>> worldMap = new HashMap<>();
-
-        for (Map.Entry<Integer, Set<Character>> entry : groupLetter.entrySet()) {
-            ArrayList<Character> characters = new ArrayList<>(entry.getValue());
-            characters.addAll(abcdefLetters);
-            characters.sort(Comparator.comparingInt(c0 -> c0));
-            builder = new StringBuilder('\n');
-            for (Character character : characters) {
-                builder.append(character).append(" ");
-            }
-            builder.append("\n");
-            Set<String> worlds = worldMap.computeIfAbsent(entry.getKey(), (k) -> new HashSet<>());
-            for (String eachWorld : allWords) {
-                int count = 0;
-                for (int i = 0; i < eachWorld.length(); i++) {
-                    char ch = eachWorld.charAt(i);
-                    if (ch == 'T'){
-                        ch = 't';
-                    }
-                    if (abcdefLetters.contains(ch) || entry.getValue().contains(ch)){
-                        count++;
-                    }
-                    if (count == 3){
-                        worlds.add(eachWorld);
-                        break;
-                    }
-                }
-            }
-            ArrayList<String> worldList = new ArrayList<>(worldMap.get(entry.getKey()));
-            Collections.sort(worldList, Collator.getInstance(Locale.ENGLISH));
-            for (String world : worldList) {
-                builder.append(world).append(", ");
-            }
-            System.out.println(builder.toString());
-        }
-
-
         int intValue = 1;
         Set<Long> longValues = Collections.singleton(1L);
         if (longValues.contains(intValue)) {
