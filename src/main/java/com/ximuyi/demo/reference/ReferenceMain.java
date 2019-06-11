@@ -1,5 +1,8 @@
 package com.ximuyi.demo.reference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -32,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * 直接看：Finalizer
  */
 public class ReferenceMain {
+	private static final Logger logger = LoggerFactory.getLogger(ReferenceMain.class);
 
     private static final ReferenceQueue<TestBytes> queue = new ReferenceQueue<>();
     private static List<Reference<TestBytes>> root = new ArrayList<>();
@@ -54,7 +58,7 @@ public class ReferenceMain {
                 Reference<? extends TestBytes> reference = queue.remove();
                 String address = Integer.toHexString(reference.hashCode());
                 String format = String.format("collected: the address of its reference is: %s\n", address);
-                System.out.println(format);
+	            logger.debug(format);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
