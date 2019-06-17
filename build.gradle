@@ -95,7 +95,7 @@ dependencies {
     compile group: 'org.apache.lucene', name: 'lucene-demo', version:'7.5.0'
     compile group: 'com.ibeetl', name: 'beetlsql', version:'2.10.9'
     compile group: 'com.ibeetl', name: 'beetl', version:'2.9.2'
-    compile group: 'io.netty', name: 'netty-all', version:'4.1.15.Final'
+    compile group: 'io.netty', name: 'netty-all', version:'4.1.33.Final'
     compile group: 'org.apache.mina', name: 'mina-example', version:'2.0.19'
     compile group: 'io.grpc', name: 'grpc-all', version: '1.18.0'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version:'3.3.0'
