@@ -4,10 +4,17 @@ import com.ximuyi.common.PoolThreadFactory;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.ibatis.io.Resources;
 import org.redisson.Redisson;
+import org.redisson.api.RBitSet;
 import org.redisson.api.RBucket;
+import org.redisson.api.RExpirable;
 import org.redisson.api.RFuture;
-import org.redisson.api.RKeys;
+import org.redisson.api.RGeo;
+import org.redisson.api.RHyperLogLog;
+import org.redisson.api.RList;
+import org.redisson.api.RLock;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.IntegerCodec;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 import org.redisson.config.ReadMode;
@@ -21,16 +28,19 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class RedissonMain {
 	private static final Logger logger = LoggerFactory.getLogger(RedissonMain.class);
 
 	private static final String PASSWORD = "123456";
-	private static final URI MASTER = URIBuilder.create("redis://127.0.0.1:7008");
+	private static final URI MASTER = URIBuilder.create("redis://127.0.0.1:7208");
 	private static final Set<URI> SLAVES = new HashSet<>(Arrays.asList(
 			URIBuilder.create("redis://127.0.0.1:7009"),
 			URIBuilder.create("redis://127.0.0.1:7010"),
@@ -64,75 +74,32 @@ public class RedissonMain {
 	    int readWriteThreadCount = 5;
 	    for (int i = 0; i < readWriteThreadCount; i++) {
 		    String unqiueId = "thread" + i;
-		    Thread writeThread = factory.newThread(() -> {
-			    handleRedisWrite(redisson, unqiueId, 10);
-		    });
-		    writeThread.start();
-		    Thread readThread = factory.newThread(() -> {
-			    handleRedisRead(redisson, unqiueId, 20);
-		    });
-		    readThread.start();
+		    factory.newThread(() -> loopRedissionHandler(redisson, unqiueId, 1000, true)).start();
+		    factory.newThread(() -> loopRedissionHandler(redisson, unqiueId, 2000, false)).start();
 	    }
     }
 
-    private static void handleRedisRead(RedissonClient redisson, String uniqueId, long sleepTime){
-	    loopHandleRBucket(redisson, uniqueId, sleepTime, (bucket, value) -> {
-		    RFuture<RedisValue> future = bucket.getAsync();
-		    future.onComplete((redisValue, exception) ->{
-			    if (exception != null) {
-				    logger.error("", exception);
-			    }
-			    else {
-				    logger.info("getAsync() is invoked successfully: {}", redisValue);
-			    }
-		    });
-	    });
-    }
-    private static void handleRedisWrite(RedissonClient redisson, String uniqueId, long sleepTime){
-	    loopHandleRBucket(redisson, uniqueId, sleepTime, (rBucket, value) -> {
-		    rBucket.set(value);
-		    int nextInt = RandomUtils.nextInt(0, 10);
-		    if (nextInt == 0){
-			    rBucket.expire(20, TimeUnit.DAYS);
-		    }
-		    else if (nextInt == 1){
-			    rBucket.delete();
-		    }
-		    else if (nextInt == 2){
-			    rBucket.clearExpire();
-		    }
-		    else if (nextInt == 3){
-			    rBucket.isExists();
-		    }
-		    else if (nextInt == 4){
-			    rBucket.touch();
-		    }
-		    else if (nextInt == 5){
-			    rBucket.remainTimeToLive();
-		    }
-		    else {
-			    rBucket.move(nextInt);
-		    }
-	    });
-    }
-
-
-    private static void loopHandleRBucket(RedissonClient redisson, String uniqueId, long sleepTime, BiConsumer<RBucket<RedisValue>, RedisValue> consumer){
-	    while(true){
-		    long count = 0;
+    private static void loopRedissionHandler(RedissonClient redisson, String uniqueId, long sleepTime, boolean isWrite){
+	    long loop = 0;
+	    while(loop++ < Long.MAX_VALUE){
+		    int count = 0;
 		    while (count++ < 1000){
-			    String key = uniqueId + (count );
-			    String string = "value" + (count);
-			    RedisValue value = new RedisValue(string);
-			    RBucket<RedisValue> bucket = redisson.getBucket(key);
 			    try {
-				    consumer.accept(bucket, value);
+				    RedisKey redisKey = new RedisKey(loop, count, uniqueId);
+				    int index = count % HANDLERS.size();
+				    RedissonHandler handler = HANDLERS.get(index);
+				    if (isWrite){
+				    	handler.writeInvoke(redisson, redisKey);
+				    }
+				    else {
+					    handler.readInvoke(redisson, redisKey);
+				    }
 			    }
 			    catch (Throwable throwable){
-			    	logger.error("{}", throwable);
+				    logger.error("{}", throwable);
 			    }
 			    if (sleepTime <= 0){
-			    	continue;
+				    continue;
 			    }
 			    try {
 				    TimeUnit.MILLISECONDS.sleep(sleepTime);
@@ -200,5 +167,265 @@ public class RedissonMain {
 				    ", empty2='" + empty2 + '\'' +
 				    '}';
 	    }
+    }
+
+	private static final List<RedissonHandler> HANDLERS = Arrays.asList(
+			new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RBucket<RedisValue> rBucket = redisson.getBucket(redisKey.key(false));
+					rBucket.set(redisKey.objValue());
+					return rBucket;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					RBucket<RedisValue> rBucket = redisson.getBucket(redisKey.key(false));
+					RFuture<RedisValue> future = rBucket.getAsync();
+					future.onComplete((redisValue, exception) ->{
+						if (exception != null) {
+							logger.error("", exception);
+						}
+						else {
+							consumer.accept(redisValue);
+						}
+					});
+				}
+			},
+			new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RBitSet bitSet = redisson.getBitSet(redisKey.key(false));
+					bitSet.set(redisKey.randomIndex(100));
+					bitSet.clear(redisKey.randomIndex(100));
+					return bitSet;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					RBitSet bitSet = redisson.getBitSet(redisKey.key(false));
+					consumer.accept(bitSet.isExists() ?  bitSet.asBitSet() : null );
+				}
+			},
+			new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RList<Integer> objectRList = redisson.getList(redisKey.key(false), new IntegerCodec());
+					objectRList.add(redisKey.count);
+					return objectRList;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					RList<Integer> objectRList = redisson.getList(redisKey.key(false), new IntegerCodec());
+					List<Integer> list = objectRList.readAll();
+					consumer.accept(list);
+					ramdomCmd(redisKey, objectRList);
+				}
+			},
+			new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RMap<Integer, RedisValue> map = redisson.getMap(redisKey.key(false), new JsonJacksonCodec());
+					map.put(redisKey.randomIndex(100), redisKey.objValue());
+					map.remove(redisKey.randomIndex(100));
+					return map;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					/***
+					 * RMap<KEY, String>  泛型的KEY byte[] String Integer 都不会报错~
+					 * 但是在运行时的时候，会报错的：例如RMap<byte[], String> map
+					 * java.lang.ClassCastException: java.lang.String cannot be cast to [B
+					 *                      ArrayList<byte[]> bytes1 = new ArrayList<>(bytes);
+					 * 						byte[] bytes2 = bytes1.get(0);
+					 *
+					 */
+					RMap<Integer, RedisValue> map = redisson.getMap(redisKey.key(false), new JsonJacksonCodec());
+					Map<Integer, RedisValue> readAllMap = map.readAllMap();
+					consumer.accept(readAllMap);
+				}
+			},
+			new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RHyperLogLog<Integer> hyperLogLog = redisson.getHyperLogLog(redisKey.key(false));
+					hyperLogLog.add(redisKey.randomIndex(1000));
+					return hyperLogLog;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					RHyperLogLog<Integer> hyperLogLog = redisson.getHyperLogLog(redisKey.key(false));
+					consumer.accept(hyperLogLog.count());
+				}
+			},
+			new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RGeo<Long> redissonGeo = redisson.getGeo(redisKey.key(false));
+					return redissonGeo;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					RGeo<Long> redissonGeo = redisson.getGeo(redisKey.key(false));
+				}
+			}
+			,new RedissonHandler() {
+
+				@Override
+				public RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey) {
+					RLock lock = redisson.getLock(redisKey.key(false));
+					lock.lock();
+					try {
+						TimeUnit.SECONDS.sleep(10);
+					} catch (InterruptedException ignored) {
+					}
+					finally {
+						lock.unlock();
+					}
+					return null;
+				}
+
+				@Override
+				public void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer) {
+					RLock lock = redisson.getLock(redisKey.key(false));
+					lock.lock();
+					try {
+						TimeUnit.SECONDS.sleep(10);
+					} catch (InterruptedException ignored) {
+					}
+					finally {
+						lock.unlock();
+					}
+				}
+			}
+	);
+
+	private static class RedisKey{
+		private final long loop;
+		private final int count;
+		private final String uniqueKey;
+
+		public RedisKey(long loop, int count, String uniqueKey) {
+			this.loop = loop;
+			this.count = count;
+			this.uniqueKey = uniqueKey;
+		}
+
+		public String key(boolean loopUnique){
+			String string = uniqueKey + count;
+			if (loopUnique){
+				string = loop + string;
+			}
+			return string;
+		}
+
+		public RedisValue objValue(){
+			return new RedisValue(stringValue());
+		}
+
+		public String stringValue(){
+			return loop + "-" + count;
+		}
+
+		public int modeIndex(int value){
+			return count % value;
+		}
+
+		public int randomIndex(int value){
+			return RandomUtils.nextInt(0, value);
+		}
+
+		public boolean random(int lessThanValue, int totalValue){
+			if (lessThanValue >= totalValue){
+				return true;
+			}
+			return RandomUtils.nextInt(0, totalValue) < lessThanValue;
+		}
+	}
+
+	private abstract static class RedissonHandler {
+
+		private final boolean isLogging;
+
+		public RedissonHandler() {
+			this(false);
+		}
+
+		public RedissonHandler(boolean isLogging) {
+			this.isLogging = isLogging;
+		}
+
+		public final void writeInvoke(RedissonClient redisson, RedisKey redisKey){
+		    RExpirable rExpirable = writeInvoke0(redisson, redisKey);
+		    if (rExpirable == null){
+		    	return;
+		    }
+		    ramdomCmd(redisKey, rExpirable);
+	    }
+
+	    public final void readInvoke(RedissonClient redisson, RedisKey redisKey){
+		    readInvoke0(redisson, redisKey, object -> {
+			    if (isLogging && object != null) {
+				    logger.info("get is invoked successfully: {}", object);
+			    }
+		    });
+	    }
+
+	    protected void ramdomCmd(RedisKey redisKey, RExpirable rObject){
+		    int nextInt = RandomUtils.nextInt(0, 15);
+		    if (nextInt == 0){
+			    rObject.delete();
+		    }
+		    else if (nextInt == 1){
+			    rObject.touch();
+		    }
+		    else if (nextInt == 2){
+			    rObject.expireAt(new Date());
+		    }
+		    else if (nextInt == 3){
+			    rObject.isExists();
+		    }
+		    else if (nextInt == 4){
+			    try {
+				    rObject.rename(redisKey.key(true));
+			    }
+			    catch (Throwable ignored){
+			    }
+		    }
+		    else if (nextInt == 5){
+			    rObject.sizeInMemory();
+		    }
+		    else if (nextInt == 6){
+		    	try {
+				    rObject.renamenx(redisKey.key(true));
+			    }
+			    catch (Throwable ignored){
+
+			    }
+		    }
+		    else if (nextInt == 7){
+			    rObject.clearExpire();
+		    }
+		    else if (nextInt == 8){
+			    rObject.remainTimeToLive();
+		    }
+		    else {
+			    rObject.move(nextInt);
+		    }
+	    }
+
+	    public abstract RExpirable writeInvoke0(RedissonClient redisson, RedisKey redisKey);
+
+	    public abstract void readInvoke0(RedissonClient redisson, RedisKey redisKey, Consumer<Object> consumer);
     }
 }
