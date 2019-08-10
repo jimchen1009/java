@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class DubboApiClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(DubboApiClient.class);
+	private static final MenuEventListener EventListener = new MenuEventListener();
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
 		/***
@@ -65,11 +66,9 @@ public class DubboApiClient {
 		logger.info("index:{} the food list: {}", index, foodList);
 	}
 
+
 	private static void invokeHi(int index, IMenuService service){
 		String params = "dubbo" + index;
-		/**
-		 *
-		 */
 		String message = service.sayHi(params);
 		logger.info("index:{} service.sayHi('{}'): {}", index, params, message);
 	}
@@ -103,6 +102,18 @@ public class DubboApiClient {
 			if (methodConfig.getName().equals("foodList")) {
 				methodConfig.setMerger("list");
 			}
+			/***
+			 * 回调函数不成效，因为设置的group是*
+			 * 调用的SEVER是：group /com.ximuyi.demo.dubbo.api.IMenuService:1.0.0
+			 * CLIENT内存保存是：* /com.ximuyi.demo.dubbo.api.IMenuService:1.0.0
+			 *
+			 * 所以找不到调用的：ConsumerMethodModel.AsyncMethodInfo
+			 */
+			methodConfig.setOnreturn(EventListener);
+			methodConfig.setOnreturnMethod(getMethodName("onReturn", methodConfig));
+			methodConfig.setOninvoke(EventListener);
+			methodConfig.setOninvokeMethod(getMethodName("onInvoke", methodConfig));
+
 			//methodConfig.setCache("expiring");
 			methodConfig.setAsync(true);
 			/**
@@ -118,7 +129,7 @@ public class DubboApiClient {
 		}
 		reference.setMethods(methodConfigs);
 		//hen you have multi-impls of a interface,you can distinguish them with the group.
-		reference.setGroup("*");
+		reference.setGroup(DubboConfigs.serviceGroupName());
 		reference.setVersion(DubboConfigs.serviceVersion());
 		/***
 		 * In the development and testing environment, it is often necessary to bypass the registry and test only designated service providers.
@@ -126,5 +137,10 @@ public class DubboApiClient {
 		 */
 		//reference.setUrl("dubbo://localhost:20880");
 		return reference;
+	}
+
+	private static String getMethodName(String prefix, MethodConfig methodConfig){
+		char ch = methodConfig.getName().toUpperCase().charAt(0);
+		return prefix + ch + methodConfig.getName().substring(1);
 	}
 }

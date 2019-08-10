@@ -11,6 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DubboConfigs {
+
+	public static String serviceGroupName(){
+		List<String> groupNames = serviceGroupNames();
+		return groupNames.size() == 1 ? groupNames.get(0) : "*";
+
+	}
+
 	public static List<String> serviceGroupNames(){
 		/**
 		 * hen you have multi-impls of a interface,you can distinguish them with the group.
