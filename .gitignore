@@ -75,7 +75,7 @@ tmp/
 .texlipse
 
 ### Custom template
-classes/
+/classes/
 /logs/
 /ignoredata/
 

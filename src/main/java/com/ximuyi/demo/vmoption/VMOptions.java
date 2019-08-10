@@ -15,9 +15,9 @@ public class VMOptions {
 	public static void main(String[] args) throws InterruptedException {
 		//recursion(0, 0);
 		//recursion(new RcursionValue());
-		//GC0();
+		GC0();
 		//GC1();
-		GC2();
+		//GC2();
 	}
 
 	/**

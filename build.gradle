@@ -1,4 +1,11 @@
 apply plugin: 'java'
+/***
+ * Could not find method providedCompile() for arguments [{group=javax.servlet, name=javax.servlet-api, version=4.0.1}]
+ * on object of type org.gradle.api.internal.artifacts.dsl.dependencies.DefaultDependencyHandler.
+ *
+ * solution: apply plugin: 'war'
+ */
+apply plugin: 'war'
 apply plugin: 'eclipse'
 apply plugin: 'com.google.protobuf'
 
@@ -83,9 +90,6 @@ dependencies {
     compile group: 'org.freemarker', name: 'freemarker', version:'2.3.23'
     compile group: 'org.quartz-scheduler', name: 'quartz', version:'2.2.1'
     compile group: 'org.quartz-scheduler', name: 'quartz-jobs', version:'2.2.1'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.11.0'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.11.0'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version:'2.11.0'
     compile group: 'com.alibaba', name: 'fastjson', version:'1.2.46'
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
     compile group: 'com.google.guava', name: 'guava', version:'26.0-jre'
@@ -96,14 +100,13 @@ dependencies {
     compile group: 'com.ibeetl', name: 'beetlsql', version:'2.10.9'
     compile group: 'com.ibeetl', name: 'beetl', version:'2.9.2'
     compile group: 'io.netty', name: 'netty-all', version:'4.1.33.Final'
-    compile group: 'org.apache.mina', name: 'mina-example', version:'2.0.19'
     compile group: 'io.grpc', name: 'grpc-all', version: '1.18.0'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version:'3.3.0'
     compile files("${System.properties['java.home']}/../lib/tools.jar")
     /**
      * What's the difference between JAVA_HOME and java.home? JAVA_HOME is the JDK install directory, e.g., C:\jdk5.
      * It's meant to be set as an environment variable and referenced in Windows batch files or Unix scripts.
-     * I always have it in my Windows Control Panel and .tcsh files,along with other common environment variables.
+     * I always have it in my Windows Contrmina-examplol Panel and .tcsh files,along with other common environment variables.
      * Some Java applications use the name jdk.home for this purpose, which I think is a better name.
      * But JAVA_HOME has been used since the beginning and is now a convention.
      *
@@ -113,7 +116,7 @@ dependencies {
      * you can also use ${java.home} in build files.
      *
      * */
-    compile group: 'com.taobao.common', name: 'tedis-group', version:'1.1.8'
+    compile group: 'com.taobao.common', name: 'tedis-group', version: '1.1.8'
     compile group: 'com.taobao.diamond', name: 'diamond-client', version: '3.7.0-sopen'
     compile group: 'com.taobao.diamond', name: 'diamond-utils', version: '3.2.0'
     compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13'
@@ -122,6 +125,43 @@ dependencies {
     compile group: 'com.rabbitmq', name: 'amqp-client', version: '5.6.0'
     compile group: 'org.iq80.leveldb', name: 'leveldb', version: '0.10'
 
+    compile group: 'org.apache.dubbo', name: 'dubbo', version: '2.7.3'
+    compile group: 'org.apache.dubbo', name: 'dubbo-dependencies-zookeeper', version: '2.7.3'
+    compile group: 'com.caucho', name: 'hessian', version: '4.0.62'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.17.v20190418'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.17.v20190418'
+    //
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.2'
+    //If existing components use Log4j 1.x and you want to have this logging routed to Log4j 2, then remove any log4j 1.x dependencies and add the following.
+    compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version:'2.2'
+    //If existing components use Apache Commons Logging 1.x and you want to have this logging routed to Log4j 2, then add the following but do not remove any Commons Logging 1.x dependencies.
+    compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version:'2.2'
+    //If existing components use SLF4J and you want to have this logging routed to Log4j 2, then add the following but do not remove any SLF4J dependencies.
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version:'2.2'
+    //If existing components use Java Util Logging and you want to have this logging routed to Log4j 2, then add the following.
+    compile group: 'org.apache.logging.log4j', name: 'log4j-jul', version:'2.2'
+    /**
+     * error:
+     * INFO Log4j appears to be running in a Servlet environment, but there's no log4j-web module available.
+     * If you want better web container support, please add the log4j-web JAR to your web archive or server lib directory.
+     *
+     * solution:
+     *If you have the servlet-api Jar in your classpath, Log4j is going to think you are running in a Servlet container.
+     * Specifically, it looks for the presence of javax.servlet.ServletContext.
+     * If your application is not running in a Servlet container, then you really shouldn't need that Jar.
+     * */
+    compile group: 'org.apache.logging.log4j', name: 'log4j-web', version:'2.2'
+
 //    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.0'
 //    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.8'
+}
+
+configurations {
+    /**
+     * Apache Log4j 2 is an upgrade to Log4j that provides significant improvements over its predecessor, Log4j 1.x,
+     * and provides many of the improvements available in Logback while fixing some inherent problems in Logback’s architecture.
+     * */
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 }

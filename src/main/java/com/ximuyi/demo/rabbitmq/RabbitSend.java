@@ -22,7 +22,7 @@ public class RabbitSend {
 			 */
 			boolean durable = true;
 			channel.queueDeclare(QUEUE_NAME, durable, false, false, null);
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 1000; i++) {
 				String message = "Hello World-" + i + ".";
 				/***
 				 * 1. Now we need to mark our messages as persistent:
@@ -30,7 +30,7 @@ public class RabbitSend {
 				 * 2. we knew nothing about exchanges, but still were able to send messages to queues.
 				 * That was possible because we were using a default exchange, which we identify by the empty string ("").
 				 */
-				channel.basicPublish("", "", MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes("UTF-8"));
+				channel.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes("UTF-8"));
 				logger.debug(" [x] Sent '" + message + "'");
 				TimeUnit.SECONDS.sleep(1);
 			}

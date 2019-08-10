@@ -1,5 +1,8 @@
 package com.ximuyi.demo.idgen;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Twitter_Snowflake<br>
  * SnowFlake的结构如下(每部分用-分开):<br>
@@ -170,6 +173,7 @@ public class SnowflakeIdWorker {
 
     //==============================Test=============================================
 
+	private static final Logger logger = LoggerFactory.getLogger(SnowflakeIdWorker.class);
     /**
      * 测试
      */
@@ -178,8 +182,8 @@ public class SnowflakeIdWorker {
         SnowflakeIdWorker idWorker0 = new SnowflakeIdWorker(0, 0);
         for (int i = 0; i < 10000000; i++) {
             long id = idWorker0.nextId();
-            System.out.println(id);
+	        logger.debug("{}" ,id);
         }
-        System.out.println("耗时：" + (System.currentTimeMillis() - start));
+	    logger.debug("耗时：{}" , (System.currentTimeMillis() - start));
     }
 }
