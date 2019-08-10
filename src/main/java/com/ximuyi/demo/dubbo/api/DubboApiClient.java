@@ -26,7 +26,7 @@ public class DubboApiClient {
 		 * /dubbo/com.ximuyi.demo.dubbo.api.IMenuService/consumers/consumer%3A%2F%2F192.168.56.1%2Fcom.ximuyi.demo.dubbo.api.IMenuService%3Fapplication%3Ddubbo-consumer%26application.version%3D2.0.0%26category%3Dconsumers%26check%3Dfalse%26dubbo%3D2.0.2%26generic%3Dfalse%26interface%3Dcom.ximuyi.demo.dubbo.api.IMenuService%26lazy%3Dfalse%26methods%3DsayHi%26pid%3D10256%26qos.port%3D20222%26release%3D2.7.3%26sayHi.retries%3D1%26sayHi.timeout%3D1000%26side%3Dconsumer%26sticky%3Dfalse%26timestamp%3D1564392773901
 		 */
 		List<ReferenceConfig<IMenuService>> referenceList = new ArrayList<>();
-		for (ProtocolConfig protocolConfig : DubboConfigs.protocolConfigs()) {
+		for (ProtocolConfig protocolConfig : DubboConfigs.serverProtocolConfigs()) {
 			ReferenceConfig<IMenuService>  reference = getService();
 			reference.setProtocol(protocolConfig.getName());
 			referenceList.add(reference);
@@ -157,7 +157,9 @@ public class DubboApiClient {
 		 * Control the concurrency of all method for a specified service interface at client-side
 		 * Limit each method of com.foo.BarService to no more than 10 concurrent client-side executions (or take up thread pool threads)
 		 */
-		reference.setActives(1000);
+		reference.setActives(10);
+		//Limit client-side creating connection to no more than 10 connections for interface com.foo.BarService.
+		reference.setConnections(10);
 		return reference;
 	}
 

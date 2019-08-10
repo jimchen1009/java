@@ -31,7 +31,7 @@ public class DubboCallbackService {
 			}
 		}
 		serviceConfig.setMethods(methodConfigs);
-		serviceConfig.setProtocols(DubboConfigs.protocolConfigs());
+		serviceConfig.setProtocols(DubboConfigs.serverProtocolConfigs());
 		serviceConfig.setVersion(DubboConfigs.serviceVersion());
 		serviceConfig.export();
 		System.out.println("dubbo service started");

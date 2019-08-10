@@ -19,7 +19,7 @@ public class DubboCallbackClient {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
 		List<ReferenceConfig<ICallbackService>> referenceList = new ArrayList<>();
-		for (ProtocolConfig protocolConfig : DubboConfigs.protocolConfigs()) {
+		for (ProtocolConfig protocolConfig : DubboConfigs.serverProtocolConfigs()) {
 			ReferenceConfig<ICallbackService>  reference = getService();
 			reference.setProtocol(protocolConfig.getName());
 			referenceList.add(reference);

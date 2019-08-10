@@ -39,7 +39,7 @@ public class DubboApiServer {
 				methodConfig.setExecutes(500);
 			}
 			serviceConfig.setMethods(DubboConfigs.methodConfigs(IMenuService.class));
-			serviceConfig.setProtocols(DubboConfigs.protocolConfigs());
+			serviceConfig.setProtocols(DubboConfigs.serverProtocolConfigs());
 			serviceConfig.setVersion(DubboConfigs.serviceVersion());
 			serviceConfig.setDelay(5000);
 			serviceList.add(serviceConfig);

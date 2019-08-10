@@ -75,7 +75,7 @@ public class DubboConfigs {
 		return registryConfig;
 	}
 
-	public static List<ProtocolConfig> protocolConfigs(){
+	public static List<ProtocolConfig> serverProtocolConfigs(){
 		return Arrays.asList(
 				//protocolConfig("rmi", 1099),
 				//protocolConfig("hessian", 8080),
@@ -104,6 +104,7 @@ public class DubboConfigs {
 		protocolConfig.setThreads(10);
 		protocolConfig.setCorethreads(10);
 		protocolConfig.setIothreads(10);
+		protocolConfig.setAccepts(100);
 		return protocolConfig;
 	}
 
