@@ -1,5 +1,6 @@
 package com.ximuyi.demo.dubbo.api;
 
+import org.apache.dubbo.config.MethodConfig;
 import org.apache.dubbo.config.ServiceConfig;
 
 import java.util.ArrayList;
@@ -24,6 +25,19 @@ public class DubboApiServer {
 			serviceConfig.setRef(new MenuServiceImpl(groupName));
 			//service.setRef(new MenuServiceAsync(groupName));
 			serviceConfig.setGroup(groupName);
+			/**
+			 * Control the concurrency of all method for a specified service interface at server-side
+			 * Limit each method of com.foo.BarService to no more than 10 concurrent server-side executions (or take up thread pool threads):
+			 */
+			serviceConfig.setExecutes(1000);
+			List<MethodConfig> methodConfigs = DubboConfigs.methodConfigs(IMenuService.class);
+			for (MethodConfig methodConfig : methodConfigs) {
+				/**
+				 *  Control the concurrency of specified method for a specified service interface at server-side
+				 * Limit the sayHello method of com.foo.BarService to no more than 10 concurrent server-side
+				 */
+				methodConfig.setExecutes(500);
+			}
 			serviceConfig.setMethods(DubboConfigs.methodConfigs(IMenuService.class));
 			serviceConfig.setProtocols(DubboConfigs.protocolConfigs());
 			serviceConfig.setVersion(DubboConfigs.serviceVersion());

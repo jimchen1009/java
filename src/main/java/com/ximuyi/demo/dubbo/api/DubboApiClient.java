@@ -29,13 +29,6 @@ public class DubboApiClient {
 		for (ProtocolConfig protocolConfig : DubboConfigs.protocolConfigs()) {
 			ReferenceConfig<IMenuService>  reference = getService();
 			reference.setProtocol(protocolConfig.getName());
-			/**
-			 * reference.setStub(true)
-			 * Caused by: java.lang.ClassNotFoundException: com.ximuyi.demo.dubbo.api.IMenuServiceStub
-			 * 所以接口为什么需要规范成没有I开口的原因，换成使用类名的接口~
-			 */
-			reference.setStub(MenuServiceStub.class.getName());
-			reference.setMock(MenuServiceMock.class.getName());
 			referenceList.add(reference);
 		}
 		for (int i = 0; i < 1000; i++) {
@@ -132,6 +125,12 @@ public class DubboApiClient {
 			 * To reduce the cost of creating and managing Future objects.
 			 */
 			methodConfig.setReturn(true);
+			/***
+			 * Control the concurrency of specified method for a specified service interface at client-side
+			 * Limit the sayHello method of com.foo.BarService to no more than 10 concurrent client-side executions(or take up thread pool threads)
+			 */
+			methodConfig.setActives(500);
+
 		}
 		reference.setMethods(methodConfigs);
 		//hen you have multi-impls of a interface,you can distinguish them with the group.
@@ -142,6 +141,23 @@ public class DubboApiClient {
 		 * In this case, point-to-point direct connection may be required, and the service provider will ignore the list of provider registration providers.
 		 */
 		//reference.setUrl("dubbo://localhost:20880");
+		/**
+		 * reference.setStub(true)
+		 * Caused by: java.lang.ClassNotFoundException: com.ximuyi.demo.dubbo.api.IMenuServiceStub
+		 * 所以接口为什么需要规范成没有I开口的原因，换成使用类名的接口~
+		 */
+		reference.setStub(MenuServiceStub.class.getName());
+		reference.setMock(MenuServiceMock.class.getName());
+		/**
+		 * You can config the loadbalance attribute with leastactive at server-side or client-side,
+		 * then the framework will make consumer call the minimum number of concurrent one.
+		 */
+		reference.setLoadbalance("leastactive");
+		/***
+		 * Control the concurrency of all method for a specified service interface at client-side
+		 * Limit each method of com.foo.BarService to no more than 10 concurrent client-side executions (or take up thread pool threads)
+		 */
+		reference.setActives(1000);
 		return reference;
 	}
 
