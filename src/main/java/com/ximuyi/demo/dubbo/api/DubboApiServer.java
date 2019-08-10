@@ -17,17 +17,18 @@ public class DubboApiServer {
 		List<ServiceConfig<IMenuService>> serviceList = new ArrayList<>();
 		List<String> groupNames = DubboConfigs.serviceGroupNames();
 		for (String groupName : groupNames) {
-			ServiceConfig<IMenuService> service = new ServiceConfig<>();
-			service.setApplication(DubboConfigs.applicationConfig("dubbo-provider", 20221));
-			service.setRegistries(DubboConfigs.registryConfigs());
-			service.setInterface(IMenuService.class);
-			service.setRef(new MenuServiceImpl(groupName));
+			ServiceConfig<IMenuService> serviceConfig = new ServiceConfig<>();
+			serviceConfig.setApplication(DubboConfigs.applicationConfig("dubbo-provider", 20221));
+			serviceConfig.setRegistries(DubboConfigs.registryConfigs());
+			serviceConfig.setInterface(IMenuService.class);
+			serviceConfig.setRef(new MenuServiceImpl(groupName));
 			//service.setRef(new MenuServiceAsync(groupName));
-			service.setGroup(groupName);
-			service.setMethods(DubboConfigs.methodConfigs(IMenuService.class));
-			service.setProtocols(DubboConfigs.protocolConfigs());
-			service.setVersion(DubboConfigs.serviceVersion());
-			serviceList.add(service);
+			serviceConfig.setGroup(groupName);
+			serviceConfig.setMethods(DubboConfigs.methodConfigs(IMenuService.class));
+			serviceConfig.setProtocols(DubboConfigs.protocolConfigs());
+			serviceConfig.setVersion(DubboConfigs.serviceVersion());
+			serviceConfig.setDelay(5000);
+			serviceList.add(serviceConfig);
 		}
 		serviceList.forEach(ServiceConfig::export);
 		System.out.println("dubbo service started");
