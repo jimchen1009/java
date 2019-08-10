@@ -35,9 +35,9 @@ public class DubboApiClient {
 			 * 所以接口为什么需要规范成没有I开口的原因，换成使用类名的接口~
 			 */
 			reference.setStub(MenuServiceStub.class.getName());
+			reference.setMock(MenuServiceMock.class.getName());
 			referenceList.add(reference);
 		}
-		referenceList.add(getService());
 		for (int i = 0; i < 1000; i++) {
 			TimeUnit.SECONDS.sleep(5);
 			ReferenceConfig<IMenuService> reference = referenceList.get(i % referenceList.size());

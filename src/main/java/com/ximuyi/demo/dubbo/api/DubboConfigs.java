@@ -111,7 +111,7 @@ public class DubboConfigs {
 		Method[] methods = cls.getMethods();
 		List<MethodConfig> configList = new ArrayList<>();
 		for (Method method : methods) {
-			MethodConfig config = methodConfig(method.getName(), 60000, 1);
+			MethodConfig config = methodConfig(method.getName(), 60000, 0);
 			configList.add(config);
 		}
 		return configList;
