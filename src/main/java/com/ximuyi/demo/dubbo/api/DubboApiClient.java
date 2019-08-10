@@ -29,6 +29,12 @@ public class DubboApiClient {
 		for (ProtocolConfig protocolConfig : DubboConfigs.protocolConfigs()) {
 			ReferenceConfig<IMenuService>  reference = getService();
 			reference.setProtocol(protocolConfig.getName());
+			/**
+			 * reference.setStub(true)
+			 * Caused by: java.lang.ClassNotFoundException: com.ximuyi.demo.dubbo.api.IMenuServiceStub
+			 * 所以接口为什么需要规范成没有I开口的原因，换成使用类名的接口~
+			 */
+			reference.setStub(MenuServiceStub.class.getName());
 			referenceList.add(reference);
 		}
 		referenceList.add(getService());
