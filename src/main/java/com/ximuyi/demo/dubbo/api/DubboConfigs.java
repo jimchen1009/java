@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DubboConfigs {
-
 	public static List<String> serviceGroupNames(){
 		/**
 		 * hen you have multi-impls of a interface,you can distinguish them with the group.
@@ -37,6 +36,13 @@ public class DubboConfigs {
 		ApplicationConfig applicationConfig = new ApplicationConfig(name);
 		applicationConfig.setQosPort(qosPort);
 		applicationConfig.setVersion("2.0.0");
+		/***
+		 * org.apache.dubbo.common.logger.slf4j.Slf4jLoggerAdapter
+		 * org.apache.dubbo.common.logger.jcl.JclLoggerAdapter
+		 * org.apache.dubbo.common.logger.log4j.Log4jLoggerAdapter
+		 * org.apache.dubbo.common.logger.log4j2.Log4j2LoggerAdapter
+		 * org.apache.dubbo.common.logger.jdk.JdkLoggerAdapter
+		 */
 		applicationConfig.setLogger("slf4j");
 		return applicationConfig;
 	}
@@ -88,12 +94,14 @@ public class DubboConfigs {
 		protocolConfig.setPort(port);
 		protocolConfig.setDispatcher("all");
 		protocolConfig.setThreadpool("fixed");
-		protocolConfig.setThreads(5);
+		protocolConfig.setThreads(10);
+		protocolConfig.setCorethreads(10);
+		protocolConfig.setIothreads(10);
 		return protocolConfig;
 	}
 
-	public static List<MethodConfig> methodConfigs(){
-		Method[] methods = IMenuService.class.getMethods();
+	public static List<MethodConfig> methodConfigs(Class<?> cls){
+		Method[] methods = cls.getMethods();
 		List<MethodConfig> configList = new ArrayList<>();
 		for (Method method : methods) {
 			MethodConfig config = methodConfig(method.getName(), 60000, 1);

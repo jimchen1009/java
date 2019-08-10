@@ -24,7 +24,7 @@ public class DubboApiServer {
 			service.setRef(new MenuServiceImpl(groupName));
 			//service.setRef(new MenuServiceAsync(groupName));
 			service.setGroup(groupName);
-			service.setMethods(DubboConfigs.methodConfigs());
+			service.setMethods(DubboConfigs.methodConfigs(IMenuService.class));
 			service.setProtocols(DubboConfigs.protocolConfigs());
 			service.setVersion(DubboConfigs.serviceVersion());
 			serviceList.add(service);

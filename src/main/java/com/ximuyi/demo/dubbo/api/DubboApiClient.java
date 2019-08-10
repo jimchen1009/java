@@ -89,7 +89,7 @@ public class DubboApiClient {
 
 		reference.setRegistries(DubboConfigs.registryConfigs());
 		reference.setInterface(IMenuService.class);
-		List<MethodConfig> methodConfigs = DubboConfigs.methodConfigs();
+		List<MethodConfig> methodConfigs = DubboConfigs.methodConfigs(IMenuService.class);
 		/***
 		 * lru Delete excess cache Based on the principle of least recently used. The hottest data is cached.
 		 * threadlocal The current thread cache. For example, a page have a lot of portal and each portal need to check user information, you can reduce this redundant visit with this cache.
