@@ -1,7 +1,6 @@
 package com.ximuyi.demo.mysql;
 
 import com.ximuyi.common.PoolThreadFactory;
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.io.Resources;
 import org.slf4j.Logger;
@@ -34,29 +33,8 @@ public class MysqlDeadLockMain {
         InputStream stream = Resources.getResourceAsStream("demo.properties");
         properties.load(stream);
 
-	    String driver = properties.getProperty("jdbc.driverClassName");
-        String url = properties.getProperty("jdbc.url");
-        String username = properties.getProperty("jdbc.username");
-        String password = properties.getProperty("jdbc.password");
-	    properties.clear();
-
 	    int connectionCount = 2;
-
-	    properties.setProperty("driverClassName", driver);
-	    properties.setProperty("jdbcUrl", url);
-	    properties.setProperty("username", username);
-	    properties.setProperty("password", password);
-	    properties.setProperty("autoCommit", String.valueOf(true));
-	    // c3p0的idleTimeout单位是秒，而HikariCP的单位是毫秒，为了统一单位，这里需要转成毫秒。
-	    properties.setProperty("connectionTimeout", "5000");
-	    properties.setProperty("minimumIdle", String.valueOf(connectionCount));
-	    properties.setProperty("maximumPoolSize",String.valueOf(connectionCount));
-	    // sql批量执行优化，有sql不能带;的副作用，所以只能选择性使用
-	    properties.setProperty("dataSource.useServerPrepStmts", "false");
-	    properties.setProperty("dataSource.rewriteBatchedStatements", "true");
-
-	    HikariConfig hikariConfig = new HikariConfig(properties);
-	    HikariDataSource dataSource = new HikariDataSource(hikariConfig);
+	    HikariDataSource dataSource = new MysqlSourceBuilder(properties).build(connectionCount);
 
 	    PoolThreadFactory factory = new PoolThreadFactory("mysql", false);
 	    CountDownLatch downLatch = new CountDownLatch(connectionCount);
@@ -109,10 +87,10 @@ public class MysqlDeadLockMain {
 		    }catch (Exception e) {
 			    BatchUpdateException batchUpdateException = recursiveFindException(e, BatchUpdateException.class);
 			    if (batchUpdateException != null) {
-				    logger.error("updateCounts:{}", batchUpdateException.getUpdateCounts());
+				    logger.error("updateCounts:{}", batchUpdateException.getUpdateCounts(), e);
 			    }
 			    else {
-				    //logger.error("", e);
+				    logger.error("", e);
 			    }
 		    } finally {
 			    //logger.info("连接[{}]执行{}", connection.toString(), current == count? "成功" : "失败");
