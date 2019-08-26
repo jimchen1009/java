@@ -10,6 +10,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Configuring the attributes of the consumer side as much as possible on the provider side
+ * the reason is：
+ *
+ * Service providers are more aware of service performance parameters than service users，Such as the timeout time of the call,
+ * the reasonable retry times, and so on.
+ * 
+ * If a attribute is configurated in provider side, not configurated in consumer side,
+ * consumer service will use the attribute in provider side. That is to say, the provider side's attribute can be used as consumer's default value [1].
+ * Otherwise, consumer service will use consumer-side's attribute，but can't cnotrol the provider service,it's usually unreasonable.
+ */
 public class DubboConfigs {
 
 	public static String serviceGroupName(){
@@ -52,6 +63,7 @@ public class DubboConfigs {
 		 */
 		applicationConfig.setLogger("slf4j");
 		applicationConfig.setDumpDirectory("./dubbo/dump");
+		applicationConfig.setShutwait("10000");
 		return applicationConfig;
 	}
 
