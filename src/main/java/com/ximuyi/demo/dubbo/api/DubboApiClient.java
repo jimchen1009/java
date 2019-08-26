@@ -160,6 +160,7 @@ public class DubboApiClient {
 		reference.setActives(10);
 		//Limit client-side creating connection to no more than 10 connections for interface com.foo.BarService.
 		reference.setConnections(10);
+		reference.setLazy(true);
 		return reference;
 	}
 

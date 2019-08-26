@@ -153,6 +153,8 @@ dependencies {
      * If your application is not running in a Servlet container, then you really shouldn't need that Jar.
      * */
     compile group: 'org.apache.logging.log4j', name: 'log4j-web', version:'2.2'
+    compile group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
+
 
 //    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.0'
 //    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.8'

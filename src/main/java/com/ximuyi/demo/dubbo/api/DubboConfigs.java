@@ -51,6 +51,7 @@ public class DubboConfigs {
 		 * org.apache.dubbo.common.logger.jdk.JdkLoggerAdapter
 		 */
 		applicationConfig.setLogger("slf4j");
+		applicationConfig.setDumpDirectory("./dubbo/dump");
 		return applicationConfig;
 	}
 
@@ -101,10 +102,11 @@ public class DubboConfigs {
 		protocolConfig.setPort(port);
 		protocolConfig.setDispatcher("all");
 		protocolConfig.setThreadpool("fixed");
-		protocolConfig.setThreads(10);
-		protocolConfig.setCorethreads(10);
-		protocolConfig.setIothreads(10);
+		protocolConfig.setThreads(5);
+		protocolConfig.setCorethreads(5);
+		protocolConfig.setIothreads(5);
 		protocolConfig.setAccepts(100);
+		protocolConfig.setSerialization("kryo");
 		return protocolConfig;
 	}
 
