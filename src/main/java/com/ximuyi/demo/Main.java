@@ -1,27 +1,27 @@
     package com.ximuyi.demo;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+    import org.apache.commons.lang3.RandomUtils;
+    import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
 
-import java.net.URL;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+    import java.io.BufferedReader;
+    import java.io.File;
+    import java.io.FileNotFoundException;
+    import java.io.FileReader;
+    import java.io.FileWriter;
+    import java.io.IOException;
+    import java.util.ArrayList;
+    import java.util.Collections;
+    import java.util.HashMap;
+    import java.util.Iterator;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Set;
+    import java.util.concurrent.ScheduledThreadPoolExecutor;
+    import java.util.concurrent.TimeUnit;
 
-/**
+    /**
  * Created by chenjingjun on 2018-04-04.
  */
 public class Main {
@@ -55,9 +55,25 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
+	    List<String> readLines = new ArrayList<>();
+	    for (int i = 1; i <= 50000; i++) {
+		    readLines.add("ptGM" + i);
+	    }
+	    for (int i = 0; i < 5; i++) {
+	    	String fileName = "协会账号乱序 " + i + ".txt";
+		    FileWriter fileWriter = new FileWriter("C:\\Users\\chenjingjun\\Desktop\\" + fileName);
+		    fileWriter.write("openid;\n");
+		    for (int j = 0; j < 10000; j++) {
+			    int index = RandomUtils.nextInt(1, readLines.size() - 1);
+			    String string = readLines.get(index);
+			    fileWriter.write(string + ";\n");
+		    }
+		    fileWriter.flush();
+	    }
 
-        BasicThreadFactory factory = new BasicThreadFactory.Builder()
+
+	    BasicThreadFactory factory = new BasicThreadFactory.Builder()
                 .namingPattern("CacheScheduler-%d")
                 .uncaughtExceptionHandler((t, e) -> logger.error("", e))
                 .daemon(true)
