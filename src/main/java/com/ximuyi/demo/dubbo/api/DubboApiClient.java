@@ -3,6 +3,7 @@ package com.ximuyi.demo.dubbo.api;
 import org.apache.dubbo.config.MethodConfig;
 import org.apache.dubbo.config.ProtocolConfig;
 import org.apache.dubbo.config.ReferenceConfig;
+import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.RpcContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,25 +26,28 @@ public class DubboApiClient {
 		 * /dubbo/com.ximuyi.demo.dubbo.api.IMenuService/consumers/consumer%3A%2F%2F192.168.56.1%2Fcom.ximuyi.demo.dubbo.api.IMenuService%3Fapplication%3Ddubbo-consumer%26application.version%3D2.0.0%26category%3Dconsumers%26check%3Dfalse%26dubbo%3D2.0.2%26generic%3Dfalse%26interface%3Dcom.ximuyi.demo.dubbo.api.IMenuService%26lazy%3Dfalse%26methods%3DsayHi%26pid%3D10256%26protocol%3Drmi%26qos.port%3D20222%26release%3D2.7.3%26sayHi.retries%3D1%26sayHi.timeout%3D1000%26side%3Dconsumer%26sticky%3Dfalse%26timestamp%3D1564392773235
 		 * /dubbo/com.ximuyi.demo.dubbo.api.IMenuService/consumers/consumer%3A%2F%2F192.168.56.1%2Fcom.ximuyi.demo.dubbo.api.IMenuService%3Fapplication%3Ddubbo-consumer%26application.version%3D2.0.0%26category%3Dconsumers%26check%3Dfalse%26dubbo%3D2.0.2%26generic%3Dfalse%26interface%3Dcom.ximuyi.demo.dubbo.api.IMenuService%26lazy%3Dfalse%26methods%3DsayHi%26pid%3D10256%26qos.port%3D20222%26release%3D2.7.3%26sayHi.retries%3D1%26sayHi.timeout%3D1000%26side%3Dconsumer%26sticky%3Dfalse%26timestamp%3D1564392773901
 		 */
-		List<ReferenceConfig<IMenuService>> referenceList = new ArrayList<>();
-		for (ProtocolConfig protocolConfig : DubboConfigs.serverProtocolConfigs()) {
+		List<ProtocolConfig> protocolConfigs = DubboConfigs.serverProtocolConfigs();
+		List<String> referenceKeys = new ArrayList<>();
+		for (int i = 0; i < protocolConfigs.size(); i++) {
 			ReferenceConfig<IMenuService>  reference = getService();
-			reference.setProtocol(protocolConfig.getName());
-			referenceList.add(reference);
+			reference.setProtocol(protocolConfigs.get(i).getName());
+			ReferenceConfigCache cache = ReferenceConfigCache.getCache();
+			cache.get(reference);
+			String generateKey = ReferenceConfigCache.DEFAULT_KEY_GENERATOR.generateKey(reference);
+			referenceKeys.add(generateKey);
 		}
 		for (int i = 0; i < 1000; i++) {
 			TimeUnit.SECONDS.sleep(5);
-			ReferenceConfig<IMenuService> reference = referenceList.get(i % referenceList.size());
-			IMenuService service = reference.get();
+			ReferenceConfigCache cache = ReferenceConfigCache.getCache();
+			String referenceKey = referenceKeys.get(i % referenceKeys.size());
+			IMenuService service = cache.get(referenceKey, IMenuService.class);
 			beforeInvoke();
 			//invokeHi(i, service);
 			invokeHiAsync01(i, service);
 			//invokeFoodList(i, service);
 			//invokeFoodListAsync(i, service);
 		}
-		for (ReferenceConfig<IMenuService> reference : referenceList) {
-			reference.destroy();
-		}
+		ReferenceConfigCache.getCache().destroyAll();
 	}
 
 	private static void invokeHiAsync01(int index, IMenuService service) throws ExecutionException, InterruptedException {
