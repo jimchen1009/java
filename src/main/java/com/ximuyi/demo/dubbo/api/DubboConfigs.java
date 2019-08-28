@@ -1,7 +1,9 @@
 package com.ximuyi.demo.dubbo.api;
 
 import org.apache.dubbo.config.ApplicationConfig;
+import org.apache.dubbo.config.MetadataReportConfig;
 import org.apache.dubbo.config.MethodConfig;
+import org.apache.dubbo.config.MonitorConfig;
 import org.apache.dubbo.config.ProtocolConfig;
 import org.apache.dubbo.config.RegistryConfig;
 
@@ -16,12 +18,16 @@ import java.util.List;
  *
  * Service providers are more aware of service performance parameters than service users，Such as the timeout time of the call,
  * the reasonable retry times, and so on.
- * 
+ *
  * If a attribute is configurated in provider side, not configurated in consumer side,
  * consumer service will use the attribute in provider side. That is to say, the provider side's attribute can be used as consumer's default value [1].
  * Otherwise, consumer service will use consumer-side's attribute，but can't cnotrol the provider service,it's usually unreasonable.
  */
 public class DubboConfigs {
+
+	private static final String ZOOKEEPER_URL = "zookeeper://192.168.56.1:2181";
+	private static final String ZOOKEEPER_GROUP = "dubbo";
+	private static final String APP_VERSION = "2.0.0";
 
 	public static String serviceGroupName(){
 		List<String> groupNames = serviceGroupNames();
@@ -53,7 +59,7 @@ public class DubboConfigs {
 	public static ApplicationConfig applicationConfig(String name, int qosPort){
 		ApplicationConfig applicationConfig = new ApplicationConfig(name);
 		applicationConfig.setQosPort(qosPort);
-		applicationConfig.setVersion("2.0.0");
+		applicationConfig.setVersion(APP_VERSION);
 		/***
 		 * org.apache.dubbo.common.logger.slf4j.Slf4jLoggerAdapter
 		 * org.apache.dubbo.common.logger.jcl.JclLoggerAdapter
@@ -69,8 +75,8 @@ public class DubboConfigs {
 
 	public static List<RegistryConfig> registryConfigs() {
 		return Arrays.asList(
-				registryConfig("main", "zookeeper://127.0.0.1:2181", true),
-				registryConfig("second", "zookeeper://127.0.0.1:2181", false)
+				registryConfig("main", ZOOKEEPER_URL, true),
+				registryConfig("second", ZOOKEEPER_URL, false)
 		);
 	}
 
@@ -85,7 +91,13 @@ public class DubboConfigs {
 		registryConfig.setDynamic(true);
 		registryConfig.setCheck(true);
 		registryConfig.setDefault(isDefault);
+		registryConfig.setGroup(ZOOKEEPER_GROUP);
 		return registryConfig;
+	}
+
+	public static ProtocolConfig serverProtocolConfig(){
+		List<ProtocolConfig> protocolConfigs = serverProtocolConfigs();
+		return serverProtocolConfigs().get(protocolConfigs.size() - 1);
 	}
 
 	public static List<ProtocolConfig> serverProtocolConfigs(){
@@ -138,5 +150,23 @@ public class DubboConfigs {
 		methodConfig.setTimeout(timeout);
 		methodConfig.setRetries(retries);
 		return methodConfig;
+	}
+
+	public static MonitorConfig monitorConfig(){
+		MonitorConfig monitorConfig = new MonitorConfig();
+		monitorConfig.setInterval("10");
+		monitorConfig.setProtocol("registry");
+		return monitorConfig;
+	}
+
+	public static MetadataReportConfig metadataReportConfig(){
+		MetadataReportConfig reportConfig = new MetadataReportConfig();
+		reportConfig.setAddress(ZOOKEEPER_URL);
+		reportConfig.setCycleReport(false);
+		reportConfig.setRetryPeriod(20);
+		reportConfig.setSyncReport(true);
+		reportConfig.setRetryTimes(23);
+		reportConfig.setGroup(ZOOKEEPER_GROUP);
+		return reportConfig;
 	}
 }

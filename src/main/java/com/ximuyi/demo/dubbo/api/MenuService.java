@@ -24,8 +24,8 @@ public abstract class MenuService implements IMenuService {
 	}
 
 	protected void logInvokeContext(){
-		logger.info("attachments: {}", RpcContext.getContext().getAttachments());
-		DubboUtil.logRpcContext(logger, "getContext", RpcContext.getContext());
+		//logger.info("attachments: {}", RpcContext.getContext().getAttachments());
+		//DubboUtil.logRpcContext(logger, "getContext", RpcContext.getContext());
 	}
 
 	private List<String> create(String name){

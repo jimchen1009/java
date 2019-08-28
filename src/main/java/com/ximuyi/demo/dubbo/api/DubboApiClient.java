@@ -1,23 +1,28 @@
 package com.ximuyi.demo.dubbo.api;
 
+import com.ximuyi.common.PoolThreadFactory;
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.config.MethodConfig;
-import org.apache.dubbo.config.ProtocolConfig;
+import org.apache.dubbo.config.MonitorConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
+import org.apache.dubbo.monitor.MonitorService;
 import org.apache.dubbo.rpc.RpcContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class DubboApiClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(DubboApiClient.class);
 	private static final MenuEventListener EventListener = new MenuEventListener();
+	private static final int LOOP_COUNT = Integer.MAX_VALUE;
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
 		/***
@@ -26,28 +31,45 @@ public class DubboApiClient {
 		 * /dubbo/com.ximuyi.demo.dubbo.api.IMenuService/consumers/consumer%3A%2F%2F192.168.56.1%2Fcom.ximuyi.demo.dubbo.api.IMenuService%3Fapplication%3Ddubbo-consumer%26application.version%3D2.0.0%26category%3Dconsumers%26check%3Dfalse%26dubbo%3D2.0.2%26generic%3Dfalse%26interface%3Dcom.ximuyi.demo.dubbo.api.IMenuService%26lazy%3Dfalse%26methods%3DsayHi%26pid%3D10256%26protocol%3Drmi%26qos.port%3D20222%26release%3D2.7.3%26sayHi.retries%3D1%26sayHi.timeout%3D1000%26side%3Dconsumer%26sticky%3Dfalse%26timestamp%3D1564392773235
 		 * /dubbo/com.ximuyi.demo.dubbo.api.IMenuService/consumers/consumer%3A%2F%2F192.168.56.1%2Fcom.ximuyi.demo.dubbo.api.IMenuService%3Fapplication%3Ddubbo-consumer%26application.version%3D2.0.0%26category%3Dconsumers%26check%3Dfalse%26dubbo%3D2.0.2%26generic%3Dfalse%26interface%3Dcom.ximuyi.demo.dubbo.api.IMenuService%26lazy%3Dfalse%26methods%3DsayHi%26pid%3D10256%26qos.port%3D20222%26release%3D2.7.3%26sayHi.retries%3D1%26sayHi.timeout%3D1000%26side%3Dconsumer%26sticky%3Dfalse%26timestamp%3D1564392773901
 		 */
-		List<ProtocolConfig> protocolConfigs = DubboConfigs.serverProtocolConfigs();
-		List<String> referenceKeys = new ArrayList<>();
-		for (int i = 0; i < protocolConfigs.size(); i++) {
-			ReferenceConfig<IMenuService>  reference = getService();
-			reference.setProtocol(protocolConfigs.get(i).getName());
-			ReferenceConfigCache cache = ReferenceConfigCache.getCache();
-			cache.get(reference);
-			String generateKey = ReferenceConfigCache.DEFAULT_KEY_GENERATOR.generateKey(reference);
-			referenceKeys.add(generateKey);
-		}
-		for (int i = 0; i < 1000; i++) {
-			TimeUnit.SECONDS.sleep(5);
-			ReferenceConfigCache cache = ReferenceConfigCache.getCache();
-			String referenceKey = referenceKeys.get(i % referenceKeys.size());
-			IMenuService service = cache.get(referenceKey, IMenuService.class);
-			beforeInvoke();
-			//invokeHi(i, service);
-			invokeHiAsync01(i, service);
-			//invokeFoodList(i, service);
-			//invokeFoodListAsync(i, service);
-		}
+		CountDownLatch downLatch = new CountDownLatch(2);
+		startMenuClient(downLatch);
+		startMonitorClient(downLatch);
+		downLatch.await();
 		ReferenceConfigCache.getCache().destroyAll();
+	}
+
+	private static void startMenuClient(CountDownLatch downLatch){
+		ReferenceConfig<IMenuService> reference = configMenuReference(getReferenceConfig(IMenuService.class));
+		MonitorConfig monitorConfig = DubboConfigs.monitorConfig();
+		//monitor也是一个Client的配置，所以group、version等等都要跟server端匹配
+		monitorConfig.setGroup(reference.getGroup());
+		monitorConfig.setVersion(DubboConfigs.serviceVersion());
+		reference.setMonitor(monitorConfig);
+		IMenuService service = ReferenceConfigCache.getCache().get(reference);
+		onLoopInvoke("menu", 5, (index)-> {
+			try {
+				beforeInvoke();
+				//invokeHi(index, service);
+				invokeHiAsync01(index, service);
+				//invokeFoodList(index, service);
+				//invokeFoodListAsync(index, service);
+			}
+			catch (Throwable t){
+				logger.error("index:{}", index, t);
+			}
+		}, downLatch);
+	}
+
+	private static void startMonitorClient(CountDownLatch downLatch){
+		ReferenceConfig<MonitorService> reference = getReferenceConfig(MonitorService.class);
+		MonitorService service = ReferenceConfigCache.getCache().get(reference);
+		onLoopInvoke("monitor", 10, (index)-> {
+			List<URL> urlList = service.lookup(null);
+			for (URL url : urlList) {
+				String doneCount = url.getParameter("collect.count");
+				logger.info("doneCount:{} URL:{}", doneCount, url.toIdentityString());
+			}
+		}, downLatch);
 	}
 
 	private static void invokeHiAsync01(int index, IMenuService service) throws ExecutionException, InterruptedException {
@@ -85,12 +107,39 @@ public class DubboApiClient {
 		context.setAttachment("index", "1");
 	}
 
-	private static ReferenceConfig<IMenuService> getService(){
-		ReferenceConfig<IMenuService> reference = new ReferenceConfig<>();
-		reference.setApplication(DubboConfigs.applicationConfig("dubbo-consumer", 20222));
+	private static <T> ReferenceConfig<T> getReferenceConfig(Class<T> interfaceClass){
+		ReferenceConfig<T> reference = new ReferenceConfig<>();
+		reference.setApplication(DubboConfigs.applicationConfig("dubbo-consumer", 20231));
 
 		reference.setRegistries(DubboConfigs.registryConfigs());
-		reference.setInterface(IMenuService.class);
+		reference.setInterface(interfaceClass);
+		//hen you have multi-impls of a interface,you can distinguish them with the group.
+		reference.setGroup(DubboConfigs.serviceGroupName());
+		reference.setVersion(DubboConfigs.serviceVersion());
+		/**
+		 * You can config the loadbalance attribute with leastactive at server-side or client-side,
+		 * then the framework will make consumer call the minimum number of concurrent one.
+		 */
+		reference.setLoadbalance("leastactive");
+		/***
+		 * Control the concurrency of all method for a specified service interface at client-side
+		 * Limit each method of com.foo.BarService to no more than 10 concurrent client-side executions (or take up thread pool threads)
+		 */
+		reference.setActives(10);
+		//Limit client-side creating connection to no more than 10 connections for interface com.foo.BarService.
+		reference.setConnections(10);
+		reference.setLazy(true);
+		reference.setMetadataReportConfig(DubboConfigs.metadataReportConfig());
+		reference.setProtocol(DubboConfigs.serverProtocolConfig().getName());
+		return reference;
+	}
+
+	private static String getMethodName(String prefix, MethodConfig methodConfig){
+		char ch = methodConfig.getName().toUpperCase().charAt(0);
+		return prefix + ch + methodConfig.getName().substring(1);
+	}
+
+	private static ReferenceConfig<IMenuService> configMenuReference(ReferenceConfig<IMenuService> reference){
 		List<MethodConfig> methodConfigs = DubboConfigs.methodConfigs(IMenuService.class);
 		/***
 		 * lru Delete excess cache Based on the principle of least recently used. The hottest data is cached.
@@ -137,9 +186,6 @@ public class DubboApiClient {
 
 		}
 		reference.setMethods(methodConfigs);
-		//hen you have multi-impls of a interface,you can distinguish them with the group.
-		reference.setGroup(DubboConfigs.serviceGroupName());
-		reference.setVersion(DubboConfigs.serviceVersion());
 		/***
 		 * In the development and testing environment, it is often necessary to bypass the registry and test only designated service providers.
 		 * In this case, point-to-point direct connection may be required, and the service provider will ignore the list of provider registration providers.
@@ -152,24 +198,24 @@ public class DubboApiClient {
 		 */
 		reference.setStub(MenuServiceStub.class.getName());
 		reference.setMock(MenuServiceMock.class.getName());
-		/**
-		 * You can config the loadbalance attribute with leastactive at server-side or client-side,
-		 * then the framework will make consumer call the minimum number of concurrent one.
-		 */
-		reference.setLoadbalance("leastactive");
-		/***
-		 * Control the concurrency of all method for a specified service interface at client-side
-		 * Limit each method of com.foo.BarService to no more than 10 concurrent client-side executions (or take up thread pool threads)
-		 */
-		reference.setActives(10);
-		//Limit client-side creating connection to no more than 10 connections for interface com.foo.BarService.
-		reference.setConnections(10);
-		reference.setLazy(true);
 		return reference;
 	}
 
-	private static String getMethodName(String prefix, MethodConfig methodConfig){
-		char ch = methodConfig.getName().toUpperCase().charAt(0);
-		return prefix + ch + methodConfig.getName().substring(1);
+
+	private static void onLoopInvoke(String thredName, int intervalValue, Consumer<Integer> consumer, CountDownLatch downLatch){
+		PoolThreadFactory factory = new PoolThreadFactory(thredName, false);
+		factory.newThread( ()->{
+			for (int index = 0; index < LOOP_COUNT; index++) {
+				try {
+					TimeUnit.SECONDS.sleep(intervalValue);
+					consumer.accept(index);
+				}
+				catch (Throwable t){
+					logger.error("index:{}", index, t);
+				}
+			}
+			downLatch.countDown();
+		}).start();
 	}
+
 }
