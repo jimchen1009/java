@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import sun.jvmstat.monitor.MonitorException;
 
 import java.net.URISyntaxException;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class InstrumentationMain {
@@ -16,14 +17,16 @@ public class InstrumentationMain {
 	public static void main(String[] args) throws MonitorException, URISyntaxException {
 		int processId = JVMUtils.getProcessId(InstrumentationMain.class);
 		logger.debug("processId: {}", processId);
-		InstrumentationClass instrumentationClass = new InstrumentationClass("main");
+		InstrumentationClass instance = new InstrumentationClass("main");
 		PoolThreadFactory factory = new PoolThreadFactory("hotfix", false);
 		factory.newThread( ()->{
 			for (int i = 0; i < 5000; i++) {
 				try {
-					TimeUnit.SECONDS.sleep(10);
+					TimeUnit.SECONDS.sleep(5);
 					InstrumentationClass aClass = new InstrumentationClass("class" + i);
-				logger.debug("version:{} version:{}", aClass.getVersion(), instrumentationClass.getVersion());
+					String string = UUID.randomUUID().toString().replaceAll("-", "");
+					logger.debug("new version:{} {} -> {}", aClass.getVersion(), string, aClass.calculate(string));
+					logger.debug("instance version:{} {} -> {}", instance.getVersion(), string, instance.calculate(string));
 				}
 				catch (Throwable t){
 					logger.error("", t);
