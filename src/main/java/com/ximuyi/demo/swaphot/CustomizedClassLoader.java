@@ -6,10 +6,10 @@ import java.io.InputStream;
 /**
  * Created by chenjingjun on 2018-04-02.
  */
-public class HotSwapClassLoader extends ClassLoader  {
-    public HotSwapClassLoader() {
-        super(HotSwapClassLoader.class.getClassLoader());
-        System.out.println(HotSwapClassLoader.class.getClassLoader());
+public class CustomizedClassLoader extends ClassLoader  {
+    public CustomizedClassLoader() {
+        super(CustomizedClassLoader.class.getClassLoader());
+        System.out.println(CustomizedClassLoader.class.getClassLoader());
     }
 
     public Class loadByte(byte[] classByte) {

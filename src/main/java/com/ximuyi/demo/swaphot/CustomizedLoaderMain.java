@@ -10,19 +10,19 @@ import java.util.List;
 /**
  * Created by chenjingjun on 2018-04-02.
  */
-public class TestLoad {
+public class CustomizedLoaderMain {
     /**
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        HotSwapClassLoader classloader = new HotSwapClassLoader();
-        String packagePath = TestLoad.class.getName();
-        packagePath = packagePath.substring(0, packagePath.lastIndexOf(".") + 1) + "MainTest";
-        String clsPath = System.getProperty("user.dir") + "\\target\\classes\\" + packagePath.replace(".", "\\") + ".class";
+        CustomizedClassLoader classloader = new CustomizedClassLoader();
+        String packagePath = CustomizedLoaderMain.class.getName();
+        packagePath = packagePath.substring(0, packagePath.lastIndexOf(".") + 1) + "CustomizedClass";
+        String clsPath = System.getProperty("user.dir") + "\\out\\production\\classes\\" + packagePath.replace(".", "\\") + ".class";
 
-        MainTest test = new MainTest(5);
+        CustomizedClass test = new CustomizedClass(5);
         test.print();
 
         while (true) {
@@ -32,7 +32,7 @@ public class TestLoad {
                 break;
             }
             else {
-                classloader = new HotSwapClassLoader();
+                classloader = new CustomizedClassLoader();
                 /**
                  * 以下注释为，本次测试重点信息
                  */
@@ -40,10 +40,10 @@ public class TestLoad {
                 // 会先代理给其父类加载器，由父类加载器先去尝试加载这个类，依次类推
                 // 也就是说：如存在此行时，下一行，就报错
                 // java.lang.LinkageError: loader (instance of
-                // HotSwapClassLoader): attempted duplicate class definition for
-                // name: "MainTest"
-
+                // CustomizedClassLoader): attempted duplicate class definition for
+                // name: "CustomizedClass"
 //                Class clazz = Class.forName(packagePath, false, classloader);
+
                 classloader.loadByPath(clsPath);
             }
             List names = new ArrayList<>();
@@ -63,7 +63,7 @@ public class TestLoad {
                 }
             }
         }
-        test = new MainTest(5);
+        test = new CustomizedClass(5);
         test.print();
     }
 }

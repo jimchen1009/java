@@ -3,10 +3,10 @@ package com.ximuyi.demo.swaphot;
 /**
  * Created by chenjingjun on 2018-04-02.
  */
-public class MainTest {
+public class CustomizedClass {
     private final int id;
 
-    public MainTest(int id) {
+    public CustomizedClass(int id) {
         this.id = id;
     }
 

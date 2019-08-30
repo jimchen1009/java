@@ -17,7 +17,7 @@ import java.util.Map;
 public class PJGMain {
 	
 	public static void main(String[] args) throws IOException {
-		FileReader fileReader = new FileReader("C:\\Users\\chenjingjun\\Desktop\\协会求助.txt");
+		FileReader fileReader = new FileReader("C:\\Users\\chenjingjun\\Desktop\\求助.txt");
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		List<AskCls> readLines = new ArrayList<>();
 		String readLine = bufferedReader.readLine();
@@ -36,17 +36,17 @@ public class PJGMain {
 			matchList.addAll(match(askCls));
 		}
 		int count = 10000;
-		for (int i = 1; i < 3; i++) {
+		for (int i = 1; i <= 3; i++) {
 			int min = (i - 1) * count;
 			int max = i * count;
-			if (matchList.size()< count){
-				break;
-			}
-			String fileName = String.format("协会求助压测%s.txt", i );
+			String fileName = String.format("求助压测%s.txt", i );
 			FileWriter fileWriter = new FileWriter("C:\\Users\\chenjingjun\\Desktop\\" + fileName);
 			fileWriter.write(readLines.get(0).toString() + "\n");
 			for (int j = min + 1; j <= max; j++) {
 				int length = matchList.size();
+				if (length == 0){
+					break;
+				}
 				int index = RandomUtils.nextInt(0, length);
 				fileWriter.write(matchList.remove(index) + "\n");
 			}

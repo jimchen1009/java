@@ -1,7 +1,7 @@
 package com.ximuyi.demo.mysql;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.ibatis.io.Resources;
 
 import java.io.IOException;
@@ -182,7 +182,7 @@ public class MysqlProperties {
 
 	private static void executeBatch(Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(CMD)) {
-			int count = RandomUtils.nextInt(10) + 1;
+			int count = RandomUtils.nextInt(0, 10) + 1;
 			for (int i = 0; i < count; i++) {
 				String name = "property-"+i;
 				int value = (int)(System.currentTimeMillis() / 1000);
