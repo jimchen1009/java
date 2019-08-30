@@ -1,8 +1,11 @@
 package com.ximuyi.demo.swaphot.agent;
 
+import java.util.Arrays;
+
 public class InstrumentationClass {
 
-	public static String MAIN_VERSION = "RC1";
+	//public static String MAIN_VERSION = "HOT";
+	public static String MAIN_VERSION = "RC";
 
 
 	private final String name;
@@ -10,6 +13,7 @@ public class InstrumentationClass {
 
 	public InstrumentationClass(String name) {
 		this.name = name;
+		//this.version = "5.5";
 		this.version = "0.0";
 	}
 
@@ -18,6 +22,9 @@ public class InstrumentationClass {
 	}
 
 	public String calculate(String string){
+		//char[] chars = string.toCharArray();
+		//Arrays.sort(chars);
+		//return String.valueOf(chars);
 		return string.replaceAll("[a-z]", "*");
 	}
 }

@@ -13,6 +13,22 @@ import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.security.ProtectionDomain;
 
+/**
+ * 增加字段 会报错的~
+ * java.lang.reflect.InvocationTargetException
+ * 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+ * 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+ * 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+ * 	at java.lang.reflect.Method.invoke(Method.java:483)
+ * 	at sun.instrument.InstrumentationImpl.loadClassAndStartAgent(InstrumentationImpl.java:386)
+ * 	at sun.instrument.InstrumentationImpl.loadClassAndCallAgentmain(InstrumentationImpl.java:411)
+ * Caused by: java.lang.UnsupportedOperationException: class redefinition failed: attempted to change the schema (add/remove fields)
+ * 	at sun.instrument.InstrumentationImpl.redefineClasses0(Native Method)
+ * 	at sun.instrument.InstrumentationImpl.redefineClasses(InstrumentationImpl.java:170)
+ * 	at com.ximuyi.demo.swaphot.agent.InstrumentationAgent.redefineClasses(InstrumentationAgent.java:47)
+ * 	at com.ximuyi.demo.swaphot.agent.InstrumentationAgent.agentmain(InstrumentationAgent.java:23)
+ * 	... 6 more
+ */
 public class InstrumentationAgent {
 
 	private static final Logger logger = LoggerFactory.getLogger(InstrumentationAgent.class);
