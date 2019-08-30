@@ -116,9 +116,6 @@ dependencies {
      * you can also use ${java.home} in build files.
      *
      * */
-    compile group: 'com.taobao.common', name: 'tedis-group', version: '1.1.8'
-    compile group: 'com.taobao.diamond', name: 'diamond-client', version: '3.7.0-sopen'
-    compile group: 'com.taobao.diamond', name: 'diamond-utils', version: '3.2.0'
     compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13'
     compile group: 'org.redisson', name: 'redisson', version: '3.10.3'
     compile group: 'com.lmax', name: 'disruptor', version: '3.4.2'

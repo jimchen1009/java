@@ -52,7 +52,7 @@ public class DubboApiServer {
 		serviceConfig.setMethods(DubboConfigs.methodConfigs(interfaceClass));
 		serviceConfig.setProtocols(DubboConfigs.serverProtocolConfigs());
 		serviceConfig.setVersion(DubboConfigs.serviceVersion());
-		serviceConfig.setDelay(5000);
+		//serviceConfig.setDelay(5000);
 		serviceConfig.setMetadataReportConfig(DubboConfigs.metadataReportConfig());
 		return serviceConfig;
 	}

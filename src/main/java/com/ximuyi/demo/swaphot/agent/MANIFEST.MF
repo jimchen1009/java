@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Can-Redefine-Classes: true
+Agent-Class: com.ximuyi.demo.swaphot.agent.InstrumentationAgent
+Can-Retransform-Classes: true
+
