@@ -56,10 +56,11 @@
     </appenders>
 
     <loggers>
-        <logger name="org.springframework" level="INFO"></logger>
-        <logger name="org.mybatis" level="INFO"></logger>
-        <logger name="org.apache" level="INFO"></logger>
-        <root level="all">
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.mybatis" level="INFO"/>
+        <logger name="org.apache" level="INFO"/>
+        <logger name="com.mongodb" level="INFO"/>
+        <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="DEBUG"/>
             <appender-ref ref="INFO"/>

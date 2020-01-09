@@ -1,9 +1,18 @@
 package com.ximuyi.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public class PoolThreadFactory implements ThreadFactory {
+
+	private static final Logger logger = LoggerFactory.getLogger(PoolThreadFactory.class);
+
 	private final ThreadGroup group;
 	private final AtomicInteger threadNumber = new AtomicInteger(0);
 	private final String namePrefix;
@@ -34,5 +43,48 @@ public class PoolThreadFactory implements ThreadFactory {
 		}
 
 		return t;
+	}
+
+	/**
+	 *
+	 * @param consumer
+	 * @param timeUnit
+	 * @param duration
+	 * @param endCount
+	 * @return
+	 */
+	public Thread newLoopThread(Consumer<Integer> consumer, TimeUnit timeUnit, int duration, int endCount) {
+		AtomicInteger counter = new AtomicInteger(0);
+		Runnable runnable = ()-> {
+			while(endCount <= 0 || counter.get() < endCount){
+				int count = counter.incrementAndGet();
+				try {
+					if (duration > 0){
+						long current = System.currentTimeMillis();
+						long expiration = timeUnit.toMillis(duration) + current;
+						boolean isInterrupted = Thread.currentThread().isInterrupted();
+						while(current < expiration){
+							try {
+								Thread.sleep(expiration - current);
+							}
+							catch (InterruptedException e){
+								if (isInterrupted){
+								}
+								else {
+									Thread.interrupted();
+								}
+								logger.error("", e);
+							}
+							current = System.currentTimeMillis();
+						}
+					}
+					consumer.accept(count);
+				}
+				catch (Throwable t){
+					logger.error("runnable:{} error", count, t);
+				}
+			}
+		};
+		return newThread(runnable);
 	}
 }
