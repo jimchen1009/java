@@ -1,52 +1,118 @@
 package com.ximuyi.demo.mongodb;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
+import com.mongodb.event.CommandFailedEvent;
+import com.mongodb.event.CommandListener;
+import com.mongodb.event.CommandStartedEvent;
+import com.mongodb.event.CommandSucceededEvent;
+import com.mongodb.event.ConnectionAddedEvent;
+import com.mongodb.event.ConnectionCheckedInEvent;
+import com.mongodb.event.ConnectionCheckedOutEvent;
+import com.mongodb.event.ConnectionPoolClosedEvent;
+import com.mongodb.event.ConnectionPoolListener;
+import com.mongodb.event.ConnectionPoolOpenedEvent;
+import com.mongodb.event.ConnectionPoolWaitQueueEnteredEvent;
+import com.mongodb.event.ConnectionPoolWaitQueueExitedEvent;
+import com.mongodb.event.ConnectionRemovedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+public class MongoDBManager implements IMongoDBManager {
 
-public class MongoDbManager {
+	private static final Logger logger = LoggerFactory.getLogger(MongoDBManager.class);
 
-	private static final String DB = "demo";
+	private static final String DEFAULT_DB = "demo";
 
 	private final MongoClient client;
-	private final Map<String, MongoDatabase> dbs;
-	private final Map<String, Map<String, MongoCollection<Document>>> documents;
 
-	public MongoDbManager() {
-		ServerAddress address = new ServerAddress("localhost", 27017);
-		MongoCredential credential = MongoCredential.createScramSha1Credential("root", DB, "000000".toCharArray());
-		//通过连接认证获取MongoDB连接
-		MongoClientOptions.Builder builder = MongoClientOptions.builder();
-		MongoClientOptions options = builder.sslEnabled(false).serverSelectionTimeout(1000).build();
-		this.client = new MongoClient(address, options);
-		this.dbs = new ConcurrentHashMap<>();
-		this.documents = new ConcurrentHashMap<>();
+	public MongoDBManager(List<ServerAddress> addressList) {
+		MongoCredential credential = MongoCredential.createScramSha1Credential("root", DEFAULT_DB, "000000".toCharArray());
+
+		// 新版本的连接
+		MongoClientSettings settings = MongoClientSettings.builder()
+				.addCommandListener(new MyCommandListener())
+				.applicationName("mongodb")
+				.applyToSslSettings( builder -> builder.enabled(false))
+				.applyToSocketSettings(builder -> builder.connectTimeout(1, TimeUnit.SECONDS).readTimeout(1, TimeUnit.SECONDS))
+				.applyToConnectionPoolSettings(builder -> builder.addConnectionPoolListener(new MyConnectionPoolListener()).maxSize(10))
+				.applyToClusterSettings(builder -> builder.hosts(addressList).build())
+				.build();
+		this.client = MongoClients.create(settings);
 	}
 
-
-	public MongoDatabase defaultDb(){
-		return getDb(DB);
-	}
-
-	public MongoCollection<Document> defaultDocument(String collection){
-		return getDocument(DB, collection);
-	}
 
 	public MongoDatabase getDb(String name){
-		return dbs.computeIfAbsent(name, client::getDatabase);
+		return client.getDatabase(name);
 	}
 
-	public MongoCollection<Document> getDocument(String dbName, String collection){
-		MongoDatabase db = Objects.requireNonNull(getDb(dbName));
-		Map<String, MongoCollection<Document>> documents = this.documents.computeIfAbsent(dbName, key -> new ConcurrentHashMap<>());
-		return documents.computeIfAbsent(collection, db::getCollection);
+	private final class MyCommandListener implements CommandListener{
+
+		@Override
+		public void commandStarted(CommandStartedEvent event) {
+			logger.info("{} {} {} ", event.getCommandName(), event.getRequestId(), event.getDatabaseName());
+		}
+
+		@Override
+		public void commandSucceeded(CommandSucceededEvent event) {
+			logger.info("{} {} {}(ms) ", event.getCommandName(), event.getRequestId(), event.getElapsedTime(TimeUnit.MILLISECONDS));
+		}
+
+		@Override
+		public void commandFailed(CommandFailedEvent event) {
+			logger.error("{} {}", event.getCommandName(), event.getRequestId(), event.getThrowable());
+		}
 	}
+
+
+	private final class MyConnectionPoolListener implements ConnectionPoolListener{
+
+		@Override
+		public void connectionPoolOpened(ConnectionPoolOpenedEvent event) {
+
+		}
+
+		@Override
+		public void connectionPoolClosed(ConnectionPoolClosedEvent event) {
+
+		}
+
+		@Override
+		public void connectionCheckedOut(ConnectionCheckedOutEvent event) {
+
+		}
+
+		@Override
+		public void connectionCheckedIn(ConnectionCheckedInEvent event) {
+
+		}
+
+		@Override
+		public void waitQueueEntered(ConnectionPoolWaitQueueEnteredEvent event) {
+
+		}
+
+		@Override
+		public void waitQueueExited(ConnectionPoolWaitQueueExitedEvent event) {
+
+		}
+
+		@Override
+		public void connectionAdded(ConnectionAddedEvent event) {
+
+		}
+
+		@Override
+		public void connectionRemoved(ConnectionRemovedEvent event) {
+
+		}
+	}
+
 }

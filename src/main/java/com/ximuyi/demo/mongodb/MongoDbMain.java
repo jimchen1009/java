@@ -23,12 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MongoDbMain {
-	private static final String COLLECTION = "User";
-	private static final String UNIQUE_KEY = "UserId";
 
-	private static final Logger logger = LoggerFactory.getLogger(MongoDbMain.class);
+    static final Logger logger = LoggerFactory.getLogger(MongoDbMain.class);
 
-	private static final MongoDbManager dbManager = new MongoDbManager();
+//	private static final MongoDBManager dbManager = new MongoDBManager(MongoDBConfig.STANDALONE_ADDRESS);
+	private static final MongoDBManager dbManager = new MongoDBManager(MongoDBConfig.REPLICA_ADDRESS);
 
 
 	public static void main(String[] args) throws IOException {
@@ -36,7 +35,7 @@ public class MongoDbMain {
 	}
 
 	private void firstDemo(){
-        MongoCollection<Document> collection = dbManager.defaultDocument(COLLECTION);
+        MongoCollection<Document> collection = dbManager.defaultDocument("users");
         FindIterable<Document> iterable = collection.find();
         for (Document document : iterable) {
             logger.debug("document:{}", document.toJson());
@@ -45,22 +44,21 @@ public class MongoDbMain {
         for (int i = 0; i < 5; i++) {
             Thread thread = factory.newLoopThread((index) -> {
                 for (int userId = 1; userId <= 10; userId++) {
-                    createOrLogin(userId);
+                    createOrLogin(userId, collection);
                 }
             }, TimeUnit.MILLISECONDS, RandomUtils.nextInt(50, 100), 0);
             thread.start();
         }
     }
 
-	private static void createOrLogin(long userId){
+	private static void createOrLogin(long userId, MongoCollection<Document> collection){
 		Date current = new Date();
-		MongoCollection<Document> collection = dbManager.defaultDocument(COLLECTION);
-		Document uniqueKey = new Document(UNIQUE_KEY, userId);
+		Document uniqueKey = new Document("userId", userId);
 		Document document = collection.find(uniqueKey).first();
-		Document updated = new Document("Updated", current);
+		Document updated = new Document("updated", current);
 		if (document == null){
 			String account = UUID.randomUUID().toString();
-			document = new Document(uniqueKey).append("Account", account).append("Created", current);
+			document = new Document(uniqueKey).append("account", account).append("created", current);
 			document.putAll(updated);
 			collection.insertOne(document);
 		}
