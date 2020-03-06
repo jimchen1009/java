@@ -4,10 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.mongodb.ReadPreference;
+import com.mongodb.Tag;
+import com.mongodb.TagSet;
+import com.mongodb.TaggableReadPreference;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -31,8 +37,20 @@ public class MongoDbMain {
 
 
 	public static void main(String[] args) throws IOException {
-        addFile2GridFS(1);
+//        addFile2GridFS(1);
+//        readReference();
 	}
+
+	private static void readReference(){
+        MongoCollection<Document> collection = dbManager.defaultDocument("employees");
+        List<Tag> tagList = Arrays.asList(new Tag("name", "C"));
+        TaggableReadPreference readPreference = ReadPreference.primaryPreferred(new TagSet(tagList), 5000L, TimeUnit.MILLISECONDS);
+        MongoCollection<Document> withReadPreference = collection.withReadPreference(readPreference);
+        FindIterable<Document> iterable = withReadPreference.find(new Document());
+        for (Document document : iterable) {
+            logger.info("document:{}", document);
+        }
+    }
 
 	private void firstDemo(){
         MongoCollection<Document> collection = dbManager.defaultDocument("users");

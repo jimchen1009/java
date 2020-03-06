@@ -26,7 +26,6 @@ public class MorphiaMain {
         dataStore.ensureIndexes();
         List<Employee> employees = dataStore.createQuery(Employee.class).asList();
         Map<String, Employee> employeeMap = employees.stream().collect(Collectors.toMap(Employee::getName, value -> value));
-        employeeMap.clear();    // 前置清掉~
         String[] names = new String[]{"Jim", "Okay", "None"};
         String managerName = names[0];
         List<Employee> createdList = new ArrayList<>();

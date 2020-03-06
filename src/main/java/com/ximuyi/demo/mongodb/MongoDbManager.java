@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
+import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -38,6 +39,7 @@ public class MongoDBManager implements IMongoDBManager {
 
 		// 新版本的连接
 		MongoClientSettings settings = MongoClientSettings.builder()
+				.readPreference(ReadPreference.secondary())
 				.addCommandListener(new MyCommandListener())
 				.applicationName("mongodb")
 				.applyToSslSettings( builder -> builder.enabled(false))
