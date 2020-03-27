@@ -1,6 +1,10 @@
 package com.ximuyi.demo.akka.router;
 
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.actor.Terminated;
+import akka.actor.UntypedActor;
 import akka.routing.ActorRefRoutee;
 import akka.routing.RoundRobinRoutingLogic;
 import akka.routing.Routee;
@@ -37,20 +41,20 @@ public class RouterTest extends UntypedActor {
 
     @Override
     public void onReceive(Object o) throws Exception {
-        if(o instanceof InboxTest.Msg){
-            router.route(o, getSender());//进行路由转发
-        }else if(o instanceof Terminated){
+//        if(o instanceof InboxTest.Msg){
+//            router.route(o, getSender());//进行路由转发
+//        }else if(o instanceof Terminated){
             router = router.removeRoutee(((Terminated)o).actor());//发生中断，将该actor删除。当然这里可以参考之前的actor重启策略，进行优化，为了简单，这里仅进行删除处理
-            System.out.println(((Terminated)o).actor().path() + " 该actor已经删除。router.size=" + router.routees().size());
+//            System.out.println(((Terminated)o).actor().path() + " 该actor已经删除。router.size=" + router.routees().length());
 
-            if(router.routees().size() == 0){//没有可用actor了
-                System.out.print("没有可用actor了，系统关闭。");
-                flag.compareAndSet(true, false);
-                getContext().system().terminate();
-            }
-        }else {
-            unhandled(o);
-        }
+//            if(router.routees().isEmpty()){//没有可用actor了
+//                System.out.print("没有可用actor了，系统关闭。");
+//                flag.compareAndSet(true, false);
+//                getContext().system().terminate();
+//            }
+//        }else {
+//            unhandled(o);
+//        }
 
     }
 

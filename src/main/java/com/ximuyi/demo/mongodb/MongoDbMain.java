@@ -33,12 +33,14 @@ public class MongoDbMain {
     static final Logger logger = LoggerFactory.getLogger(MongoDbMain.class);
 
 //	private static final MongoDBManager dbManager = new MongoDBManager(MongoDBConfig.STANDALONE_ADDRESS);
-	private static final MongoDBManager dbManager = new MongoDBManager(MongoDBConfig.REPLICA_ADDRESS);
+//	private static final MongoDBManager dbManager = new MongoDBManager(MongoDBConfig.REPLICA_ADDRESS);
+	private static final MongoDBManager dbManager = new MongoDBManager(MongoDBConfig.SHARDING_ADDRESS);
 
 
 	public static void main(String[] args) throws IOException {
 //        addFile2GridFS(1);
 //        readReference();
+        crateUserList();
 	}
 
 	private static void readReference(){
@@ -52,19 +54,22 @@ public class MongoDbMain {
         }
     }
 
-	private void firstDemo(){
+	private static void crateUserList(){
         MongoCollection<Document> collection = dbManager.defaultDocument("users");
         FindIterable<Document> iterable = collection.find();
         for (Document document : iterable) {
             logger.debug("document:{}", document.toJson());
         }
+        int count = 10000;
         PoolThreadFactory factory = new PoolThreadFactory("mongo", false);
-        for (int i = 0; i < 5; i++) {
-            Thread thread = factory.newLoopThread((index) -> {
-                for (int userId = 1; userId <= 10; userId++) {
+        for (int i = 5; i < 10; i++) {
+            int start = i * count;
+            int end = (i + 1) * count;
+            Thread thread = factory.newThread(() -> {
+                for (int userId =start; userId <= end; userId++) {
                     createOrLogin(userId, collection);
                 }
-            }, TimeUnit.MILLISECONDS, RandomUtils.nextInt(50, 100), 0);
+            });
             thread.start();
         }
     }
