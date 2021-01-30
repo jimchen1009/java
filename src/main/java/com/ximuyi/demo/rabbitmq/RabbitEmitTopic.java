@@ -14,8 +14,8 @@ public class RabbitEmitTopic {
 	private static final String EXCHANGE_NAME = "topic_logs";
 
 	public static void main(String[] argv) throws Exception {
-		try (Connection connection = MyConectionFactory.newConnection();
-		     Channel channel = connection.createChannel()) {
+		try (Connection connection = MyConnectionFactory.newConnection();
+			 Channel channel = connection.createChannel()) {
 
 			channel.exchangeDeclare(EXCHANGE_NAME, "topic");
 

@@ -30,9 +30,8 @@ buildscript {
 }
 
 repositories {
-
-     maven { url "http://localhost:8081/nexus/content/groups/public/" }
-     maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+    mavenCentral()
 }
 
 sourceSets {

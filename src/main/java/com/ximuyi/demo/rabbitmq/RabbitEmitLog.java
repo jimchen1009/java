@@ -13,7 +13,7 @@ public class RabbitEmitLog {
 	private static final String EXCHANGE_NAME = "logs";
 
 	public static void main(String[] argv) throws Exception {
-		try (Connection connection = MyConectionFactory.newConnection(); Channel channel = connection.createChannel()) {
+		try (Connection connection = MyConnectionFactory.newConnection(); Channel channel = connection.createChannel()) {
 			/**
 			 * As you see, after establishing the connection we declared the exchange.
 			 * This step is necessary as publishing to a non-existing exchange is forbidden.

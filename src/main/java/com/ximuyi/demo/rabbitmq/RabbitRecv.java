@@ -14,7 +14,7 @@ public class RabbitRecv {
 	private final static String QUEUE_NAME = "task_queue";
 
 	public static void main(String[] argv) throws Exception {
-		Connection connection = MyConectionFactory.newConnection();
+		Connection connection = MyConnectionFactory.newConnection();
 		Channel channel = connection.createChannel();
 		boolean durable = true;
 		channel.queueDeclare(QUEUE_NAME, durable, false, false, null);

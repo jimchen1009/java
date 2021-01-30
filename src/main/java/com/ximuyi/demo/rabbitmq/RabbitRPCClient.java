@@ -17,7 +17,7 @@ public class RabbitRPCClient  implements AutoCloseable{
 
 	public RabbitRPCClient() throws IOException, TimeoutException {
 
-		connection = MyConectionFactory.newConnection();
+		connection = MyConnectionFactory.newConnection();
 		channel = connection.createChannel();
 	}
 

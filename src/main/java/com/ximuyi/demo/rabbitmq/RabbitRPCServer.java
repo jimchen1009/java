@@ -16,7 +16,7 @@ public class RabbitRPCServer {
 
 	public static void main(String[] argv) throws Exception {
 
-		try (Connection connection = MyConectionFactory.newConnection(); Channel channel = connection.createChannel()) {
+		try (Connection connection = MyConnectionFactory.newConnection(); Channel channel = connection.createChannel()) {
 			channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
 			channel.queuePurge(RPC_QUEUE_NAME);
 

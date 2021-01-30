@@ -60,7 +60,7 @@ public class MongoDbMain {
         for (Document document : iterable) {
             logger.debug("document:{}", document.toJson());
         }
-        int count = 10000;
+        int count = 1;
         PoolThreadFactory factory = new PoolThreadFactory("mongo", false);
         for (int i = 5; i < 10; i++) {
             int start = i * count;

@@ -14,7 +14,7 @@ public class RabbitReceiveLogs {
 	private static final String EXCHANGE_NAME = "logs";
 
 	public static void main(String[] argv) throws Exception {
-		Connection connection = MyConectionFactory.newConnection();
+		Connection connection = MyConnectionFactory.newConnection();
 		Channel channel = connection.createChannel();
 
 		/***

@@ -15,7 +15,7 @@ public class RabbitSend {
 	private final static String QUEUE_NAME = "task_queue";
 
 	public static void main(String[] argv) throws Exception {
-		try (Connection connection = MyConectionFactory.newConnection(); Channel channel = connection.createChannel()) {
+		try (Connection connection = MyConnectionFactory.newConnection(); Channel channel = connection.createChannel()) {
 			/***
 			 * Two things are required to make sure that messages aren't lost:
 			 * we need to mark both the queue and messages as durable.

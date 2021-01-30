@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -56,17 +57,16 @@ public class JedisMain {
 
     public static void main(String[] args){
     	//初始化数据
-	    threadFactory.newThread(()-> initJedis(commonPool.getResource())).start();
+//	    threadFactory.newThread(()-> initJedis(commonPool.getResource())).start();
 	    threadFactory.newThread(()-> sharedPool.getResource(redis -> redis.getAllShards().forEach(JedisMain::initJedis))).start();
 	    //cluster();
-	    threadFactory.newThread(()-> channelSubscibe("channel")).start();
-	    threadFactory.newThread(()-> channelPublic("channel")).start();
-	    threadFactory.newThread(JedisMain::transactions).start();
+//	    threadFactory.newThread(()-> channelSubscibe("channel")).start();
+//	    threadFactory.newThread(()-> channelPublic("channel")).start();
+//	    threadFactory.newThread(JedisMain::transactions).start();
     }
 
     private static void initJedis(Jedis jedis){
-	    jedis.flushAll();
-	    jedis.monitor(new JedisMonitor() {
+		jedis.monitor(new JedisMonitor() {
 		    public void onCommand(String command) {
 			    logger.info("monitor command:{}", command);
 		    }

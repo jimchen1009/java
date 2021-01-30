@@ -16,11 +16,12 @@ import org.mongodb.morphia.utils.IndexType;
 
 @Entity("employees")
 @Indexes(
-        @Index(fields = @Field(value = "name", type = IndexType.ASC), options = @IndexOptions(unique = true))
+        @Index(fields = {@Field(value = "uniqueId", type = IndexType.ASC), @Field(value = "name", type = IndexType.ASC)}, options = @IndexOptions(unique = true))
 )
 class Employee {
     @Id                     // The ID can be any type you’d like but is generally something like ObjectId or Long
     private ObjectId id;
+    private long uniqueId;
     private String name;
     @Reference
     private Employee manager;

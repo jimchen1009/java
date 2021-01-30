@@ -19,7 +19,7 @@ public class MorphiaMain {
 
     static final Logger logger = LoggerFactory.getLogger(MongoDbMain.class);
 
-    private static final MongoDBLegacyManager dbManager = new MongoDBLegacyManager(MongoDBConfig.REPLICA_ADDRESS);
+    private static final MongoDBLegacyManager dbManager = new MongoDBLegacyManager(MongoDBConfig.SHARDING_ADDRESS);
 
     public static void main(String[] args) {
         Datastore dataStore = dbManager.createDefaultDataStore(Employee.class.getPackage().getName());
