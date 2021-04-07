@@ -1,8 +1,8 @@
 package com.ximuyi.demo.mysql;
 
 import com.ximuyi.common.PoolThreadFactory;
+import com.ximuyi.common.PropertiesUtil;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.ibatis.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +29,7 @@ public class MysqlDeadLockMain {
 	private static final Logger logger = LoggerFactory.getLogger(MysqlDeadLockMain.class);
 
     public static void main(String[] args) throws Throwable {
-        Properties properties = new Properties();
-        InputStream stream = Resources.getResourceAsStream("demo.properties");
-        properties.load(stream);
+        Properties properties = PropertiesUtil.getResourceAsStream("demo.properties");
 
 	    int connectionCount = 2;
 	    HikariDataSource dataSource = new MysqlSourceBuilder(properties).build(connectionCount);
