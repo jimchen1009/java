@@ -6,6 +6,19 @@
         <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] [%t] %l: %m%n"/>
         </Console>
 
+        <RollingFile name="TRACE" fileName="logs/trace.log" filePattern="logs/$${date:yyyy-MM}/trace_%d{yyyy-MM-dd}_%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <Filters>
+                <ThresholdFilter level="TRACE"/>
+                <ThresholdFilter level="DEBUG" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] [%t] %l: %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+
         <RollingFile name="DEBUG" fileName="logs/debug.log" filePattern="logs/$${date:yyyy-MM}/debug_%d{yyyy-MM-dd}_%i.log">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
             <Filters>
@@ -60,8 +73,10 @@
         <logger name="org.mybatis" level="INFO"/>
         <logger name="org.apache" level="INFO"/>
         <logger name="com.mongodb" level="INFO"/>
+        <logger name="org.apache.kafka" level="TRACE"/>
         <root level="INFO">
             <appender-ref ref="STDOUT"/>
+            <appender-ref ref="TRACE"/>
             <appender-ref ref="DEBUG"/>
             <appender-ref ref="INFO"/>
             <appender-ref ref="WARN"/>

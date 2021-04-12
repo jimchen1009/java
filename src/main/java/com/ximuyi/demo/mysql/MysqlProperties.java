@@ -1,11 +1,10 @@
 package com.ximuyi.demo.mysql;
 
-import com.ximuyi.common.PropertiesUtil;
+import com.ximuyi.common.ResourceUtil;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -19,7 +18,7 @@ public class MysqlProperties {
 	private static HikariDataSource DataSource;
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
-		Properties properties = PropertiesUtil.getResourceAsStream("mysql.properties");
+		Properties properties = ResourceUtil.getResourceAsProperties("mysql.properties");
 		DataSource = new MysqlSourceBuilder(properties).build(10);
 		scenario2();
 	}

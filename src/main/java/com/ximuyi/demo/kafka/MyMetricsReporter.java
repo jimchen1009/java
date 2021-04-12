@@ -2,34 +2,38 @@ package com.ximuyi.demo.kafka;
 
 import org.apache.kafka.common.metrics.KafkaMetric;
 import org.apache.kafka.common.metrics.MetricsReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class MyMetricsReporter implements MetricsReporter {
 
+	private static final Logger logger = LoggerFactory.getLogger(MyMetricsReporter.class);
+
 	@Override
 	public void init(List<KafkaMetric> metrics) {
-		System.out.println("[MyMetricsReporter.init]" + metrics);
+		logger.debug("{}", metrics);
 	}
 
 	@Override
 	public void metricChange(KafkaMetric metric) {
-		System.out.println("[MyMetricsReporter.metricChange]" + metric);
+		logger.debug("{}", metric);
 	}
 
 	@Override
 	public void metricRemoval(KafkaMetric metric) {
-		System.out.println("[MyMetricsReporter.metricRemoval]" + metric);
+		logger.debug("{}", metric);
 	}
 
 	@Override
 	public void close() {
-		System.out.println("[MyMetricsReporter.close]");
+		logger.debug("");
 	}
 
 	@Override
 	public void configure(Map<String, ?> configs) {
-		System.out.println("[MyMetricsReporter.configure]" + configs);
+		logger.debug("{}", configs);
 	}
 }

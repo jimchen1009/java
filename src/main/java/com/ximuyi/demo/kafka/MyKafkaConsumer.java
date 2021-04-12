@@ -1,12 +1,15 @@
 package com.ximuyi.demo.kafka;
 
-import com.ximuyi.common.PropertiesUtil;
+import com.ximuyi.common.Log4jUtil;
+import com.ximuyi.common.ResourceUtil;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -24,6 +27,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MyKafkaConsumer<K, V> implements ConsumerRebalanceListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(MyKafkaConsumer.class);
+
 
 	private final Collection<String> topicLis;
 	private final KafkaConsumer<K, V> consumer;
@@ -48,17 +54,17 @@ public class MyKafkaConsumer<K, V> implements ConsumerRebalanceListener {
 
 	@Override
 	public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-		System.out.println("[onPartitionsRevoked]: " + partitions);
+		logger.debug("{}", partitions);
 	}
 
 	@Override
 	public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-		System.out.println("[onPartitionsAssigned]: " + partitions);
+		logger.debug("{}", partitions);
 	}
 
 	@Override
 	public void onPartitionsLost(Collection<TopicPartition> partitions) {
-		System.out.println("[onPartitionsLost]: " + partitions);
+		logger.debug("{}", partitions);
 	}
 
 	public Collection<MyConsumerRecord> pool(){
@@ -88,7 +94,8 @@ public class MyKafkaConsumer<K, V> implements ConsumerRebalanceListener {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		Properties properties = PropertiesUtil.getResourceAsStream("kafka/consumer.properties");
+		Log4jUtil.initilizeV2();
+		Properties properties = ResourceUtil.getResourceAsProperties("kafka/consumer.properties");
 		MyKafkaConsumer<String, String> kafkaConsumer = new MyKafkaConsumer<>(Collections.singleton("Jim"), properties);
 		kafkaConsumer.start();
 		for (int i = 0; i < 1000; i++) {

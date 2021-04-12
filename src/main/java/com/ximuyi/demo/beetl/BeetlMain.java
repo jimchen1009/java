@@ -1,6 +1,6 @@
 package com.ximuyi.demo.beetl;
 
-import com.ximuyi.common.PropertiesUtil;
+import com.ximuyi.common.ResourceUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.beetl.core.Configuration;
@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -39,7 +38,7 @@ public class BeetlMain {
     private static final Logger logger = LoggerFactory.getLogger(BeetlMain.class);
 
     public static void main(String[] args) throws Exception {
-        Properties properties = PropertiesUtil.getResourceAsStream("demo.properties");
+        Properties properties = ResourceUtil.getResourceAsProperties("demo.properties");
         String driver = properties.getProperty("jdbc.driverClassName");
         String url = properties.getProperty("jdbc.url");
         String username = properties.getProperty("jdbc.username");
