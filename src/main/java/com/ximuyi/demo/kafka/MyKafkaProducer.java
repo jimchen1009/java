@@ -87,8 +87,15 @@ public class MyKafkaProducer<K, V> {
 	/***
 	 *
 	 * 1.
-	 * 两个线程: IO调度线程 与 业务发送消息线程
+	 * 两个线程: IO调度线程Sender 与 业务发送消息线程
 	 * 使用类作为媒介 RecordAccumulator, 并发相关的逻辑在这里类中处理
+	 *
+	 * 2. RecordAccumulator.BufferPool 限制业务发送数据大小【目测只有这限制】, 固然限制了消息内存大小了
+	 *
+	 * 3. IO线程Sender检测内存耗尽会立刻发送数据, Sender.guaranteeMessageOrder保证顺序结果类似于同步IO
+	 *
+	 * 4.
+	 *
 	 * @param args
 	 * @throws IOException
 	 * @throws InterruptedException
