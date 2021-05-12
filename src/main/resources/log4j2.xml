@@ -74,7 +74,7 @@
         <logger name="org.apache" level="INFO"/>
         <logger name="com.mongodb" level="INFO"/>
         <logger name="org.apache.kafka" level="TRACE"/>
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="TRACE"/>
             <appender-ref ref="DEBUG"/>
