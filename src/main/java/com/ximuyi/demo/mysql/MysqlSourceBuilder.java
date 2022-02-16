@@ -5,6 +5,24 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.util.Properties;
 
+/***
+ *
+ * java.sql.SQLException: Unable to load authentication plugin 'caching_sha2_password'.
+ * 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:545) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ * 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:513) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ * 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:505) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ * 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:479) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ * 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:489) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ * 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:78) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ * 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:1606) ~[mysql-connector-java-6.0.5.jar:6.0.5]
+ *
+ * 	相关文档
+ * https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html
+ *
+ *
+ *
+ *
+ */
 public class MysqlSourceBuilder {
 
 	private final Properties properties;
@@ -14,6 +32,7 @@ public class MysqlSourceBuilder {
 	private final String password;
 
 	public MysqlSourceBuilder(Properties properties) {
+
 		this.properties = new Properties();
 		this.driver = properties.getProperty("jdbc.driverClassName");
 		String url = properties.getProperty("jdbc.url");

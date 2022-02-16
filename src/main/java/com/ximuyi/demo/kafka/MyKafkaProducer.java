@@ -101,7 +101,7 @@ public class MyKafkaProducer<K, V> {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		Log4jUtil.initilizeV2();
+		Log4jUtil.initializeV2();
 		Properties properties = ResourceUtil.getResourceAsProperties("kafka/producer.properties");
 		MyKafkaProducer<String, String> kafkaProducer = new MyKafkaProducer<>("JimV2", properties);
 		for (int i = 0; i < 1000; i++) {

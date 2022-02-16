@@ -176,7 +176,7 @@ public class RxJavaObservables {
     }
 
     public static void main(String[] args) throws IOException {
-        Log4jUtil.initilizeV2();
+        Log4jUtil.initializeV2();
         create();
     }
 }

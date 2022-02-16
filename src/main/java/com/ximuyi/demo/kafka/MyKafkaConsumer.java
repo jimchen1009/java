@@ -94,7 +94,7 @@ public class MyKafkaConsumer<K, V> implements ConsumerRebalanceListener {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		Log4jUtil.initilizeV2();
+		Log4jUtil.initializeV2();
 		Properties properties = ResourceUtil.getResourceAsProperties("kafka/consumer.properties");
 		MyKafkaConsumer<String, String> kafkaConsumer = new MyKafkaConsumer<>(Collections.singleton("Jim"), properties);
 		kafkaConsumer.start();

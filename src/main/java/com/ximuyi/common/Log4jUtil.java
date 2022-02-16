@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 public class Log4jUtil {
 
-	public static final void initilizeV2() throws IOException {
+	public static final void initializeV2() throws IOException {
 		InputStream stream = ResourceUtil.getResourceAsStream("log4j2.xml");
 		final ConfigurationSource source = new ConfigurationSource(stream);
 		Configurator.initialize(null, source);

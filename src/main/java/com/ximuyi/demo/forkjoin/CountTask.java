@@ -1,7 +1,11 @@
 package com.ximuyi.demo.forkjoin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 
@@ -49,7 +53,14 @@ public class CountTask extends RecursiveTask<Integer> {
     }
 
 
+    private static final Logger logger = LoggerFactory.getLogger(CountTask.class);
+
     public static void main(String[] args){
+        ExecutorService service = Executors.newWorkStealingPool();
+        for (int i = 0; i < 100; i++) {
+            String valueOf = String.valueOf(i);
+            service.submit( ()-> logger.debug("service: {}", valueOf));
+        }
         ForkJoinPool pool = new ForkJoinPool();
         CountTask task = new CountTask(1, 50000);
         Future<Integer> future = pool.submit(task);
