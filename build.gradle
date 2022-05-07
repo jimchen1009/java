@@ -9,7 +9,7 @@ apply plugin: 'war'
 apply plugin: 'eclipse'
 apply plugin: 'com.google.protobuf'
 
-group = 'com.ximuyi.demo'
+group = 'com.jim.demo'
 version = '1.0-SNAPSHOT'
 
 description = """"""
@@ -160,6 +160,8 @@ dependencies {
     implementation group: 'io.dropwizard.metrics', name: 'metrics-jvm', version: '4.2.8'
     implementation group: 'io.dropwizard.metrics', name: 'metrics-jmx', version: '4.2.8'
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
+    implementation group: 'org.apache.shardingsphere.elasticjob', name: 'elasticjob-lite-core', version: '3.0.1'
+
 
 
 
