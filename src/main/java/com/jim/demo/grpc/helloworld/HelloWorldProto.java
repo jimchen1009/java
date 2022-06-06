@@ -36,8 +36,8 @@ public final class HelloWorldProto {
       "\n\020helloworld.proto\"\034\n\014HelloRequest\022\014\n\004na" +
       "me\030\001 \001(\t\"\035\n\nHelloReply\022\017\n\007message\030\001 \001(\t2" +
       "3\n\007Greeter\022(\n\010SayHello\022\r.HelloRequest\032\013." +
-      "HelloReply\"\000B4\n\037com.jim.demo.grpc.hel" +
-      "loworldB\017HelloWorldProtoP\001b\006proto3"
+      "HelloReply\"\000B1\n\034com.jim.demo.grpc.hellow" +
+      "orldB\017HelloWorldProtoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
