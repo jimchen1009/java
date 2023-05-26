@@ -53,7 +53,7 @@ public class CustomizedLoaderMain {
             for (Method method : clazz.getMethods()){
                 System.out.println("函数：" + method.getName());
                 if (names.contains(method.getName())){
-                    method.invoke(null, new String[] { null });
+                    method.invoke(null, new Object[] { null });
                 }
             }
             for (Field field : clazz.getFields()){

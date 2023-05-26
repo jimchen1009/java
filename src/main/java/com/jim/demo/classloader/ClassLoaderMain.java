@@ -2,15 +2,14 @@ package com.jim.demo.classloader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Launcher;
 
 public class ClassLoaderMain {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClassLoaderMain.class);
 
 	public static void main(String[] args){
-		ClassLoader appLoader = Launcher.getLauncher().getClassLoader();
-		ClassLoader lauchLoader = Launcher.class.getClassLoader();
+		ClassLoader appLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader lauchLoader = ClassLoaderMain.class.getClassLoader();
 		/***
 		 * Bootstrap ClassLoader是由C/C++编写的，它本身是虚拟机的一部分，所以它并不是一个JAVA类，也就是无法在java代码中获取它的引用，
 		 * JVM启动时通过Bootstrap类加载器加载rt.jar等核心jar包中的class文件，之前的int.class,String.class都是由它加载。

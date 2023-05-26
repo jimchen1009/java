@@ -1,13 +1,13 @@
 package com.jim.demo.swaphot;
 
-import sun.jvmstat.monitor.MonitoredVm;
+import com.sun.tools.attach.VirtualMachine;
 
 public class MonitoredVmInfo {
 
 	public final int processId;
-	public final MonitoredVm monitoredVm;
+	public final VirtualMachine monitoredVm;
 
-	public MonitoredVmInfo(int processId, MonitoredVm monitoredVm) {
+	public MonitoredVmInfo(int processId, VirtualMachine monitoredVm) {
 		this.processId = processId;
 		this.monitoredVm = monitoredVm;
 	}

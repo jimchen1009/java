@@ -1,7 +1,7 @@
 package com.jim.demo.akka.serializable;
 
-import scala.Serializable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**

@@ -15,10 +15,11 @@ import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCente
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-public class MyElasticMain {
+public class MyElasticJobMain {
 
 	private static final CoordinatorRegistryCenter register = createRegistryCenter();
 

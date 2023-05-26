@@ -1,6 +1,6 @@
 package com.jim.demo.akka.serializable;
 
-import scala.Serializable;
+import java.io.Serializable;
 
 /**
  * Created by chenjingjun on 2018-04-08.

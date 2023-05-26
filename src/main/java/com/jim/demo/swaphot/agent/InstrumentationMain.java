@@ -2,11 +2,11 @@ package com.jim.demo.swaphot.agent;
 
 import com.jim.common.PoolThreadFactory;
 import com.jim.demo.swaphot.JVMUtils;
+import com.sun.tools.attach.AttachNotSupportedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.jvmstat.monitor.MonitorException;
 
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +14,7 @@ public class InstrumentationMain {
 
 	private static final Logger logger = LoggerFactory.getLogger(InstrumentationMain.class);
 
-	public static void main(String[] args) throws MonitorException, URISyntaxException {
+	public static void main(String[] args) throws IOException, AttachNotSupportedException {
 		int processId = JVMUtils.getProcessId(InstrumentationMain.class);
 		logger.debug("processId: {}", processId);
 		InstrumentationClass instance = new InstrumentationClass("main");

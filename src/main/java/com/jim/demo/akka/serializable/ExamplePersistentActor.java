@@ -22,7 +22,7 @@ public class ExamplePersistentActor extends AbstractPersistentActor {
 
 
     @Override
-    public void postStop() {
+    public void postStop() throws Exception {
         super.postStop();
     }
 
